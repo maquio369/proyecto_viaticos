@@ -114,4 +114,36 @@ router.get('/bancos', async (req, res) => {
   }
 });
 
+// Obtener firma fija dinámica (Jefe de Unidad de Coordinación Administrativa)
+router.get('/firma-fija', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        f.id_firma,
+        f.nombre_firma,
+        f.cargo_firma,
+        e.id_empleado
+      FROM empleados e
+      JOIN firmas f ON f.nombre_firma ILIKE '%' || e.nombres || '%'
+      WHERE e.id_area = 21 
+        AND e.id_lugar_fisico_de_trabajo = 21
+        AND e.esta_borrado = false
+        AND f.esta_borrado = false
+      ORDER BY e.id_empleado ASC
+    `);
+
+    res.json({
+      success: true,
+      firmas: result.rows,
+      count: result.rows.length
+    });
+  } catch (error) {
+    console.error('Error obteniendo firma fija:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;

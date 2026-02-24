@@ -1,0 +1,59 @@
+// Reemplazo para las líneas 320-332 de ViaticosModal.js
+
+// ANTES (líneas 320-332):
+/*
+                                <input 
+                                    type="text" 
+                                    value={firmas[1] ? `${firmas[1].nombre_firma} - ${firmas[1].cargo_firma}` : 'Cargando...'} 
+                                    readOnly 
+                                    style={{ 
+                                        ...inputStyle, 
+                                        background: '#f1f8f4', 
+                                        border: '2px solid #4caf50',
+                                        fontWeight: '500',
+                                        color: '#00796b',
+                                        cursor: 'default'
+                                    }} 
+                                />
+*/
+
+// DESPUÉS (reemplazar líneas 320-332 con esto):
+                                {firmasFijasDisponibles.length > 1 ? (
+                                    // Si hay múltiples firmas, mostrar dropdown
+                                    <select 
+                                        name="id_firma_fija" 
+                                        value={formData.id_firma_fija} 
+                                        onChange={handleInputChange} 
+                                        required
+                                        style={{ 
+                                            ...inputStyle, 
+                                            background: formData.id_firma_fija ? '#f1f8f4' : 'white',
+                                            border: formData.id_firma_fija ? '2px solid #4caf50' : '2px solid #ff9800',
+                                            fontWeight: '500',
+                                            color: '#00796b',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        <option value="">⚠️ Seleccione una firma</option>
+                                        {firmasFijasDisponibles.map(firma => (
+                                            <option key={firma.id_firma} value={firma.id_firma}>
+                                                {firma.nombre_firma} - {firma.cargo_firma}
+                                            </option>
+                                        ))}
+                                    </select>
+                                ) : (
+                                    // Si hay solo una firma, mostrar campo de solo lectura
+                                    <input 
+                                        type="text" 
+                                        value={firmas[1] ? `${firmas[1].nombre_firma} - ${firmas[1].cargo_firma}` : 'Cargando...'} 
+                                        readOnly 
+                                        style={{ 
+                                            ...inputStyle, 
+                                            background: '#f1f8f4', 
+                                            border: '2px solid #4caf50',
+                                            fontWeight: '500',
+                                            color: '#00796b',
+                                            cursor: 'default'
+                                        }} 
+                                    />
+                                )}

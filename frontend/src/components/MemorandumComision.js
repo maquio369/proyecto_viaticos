@@ -1,6 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
+import {
+  Box, Typography, TextField, CircularProgress, Button, Select, MenuItem,
+  InputLabel, FormControl, Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper, Chip, IconButton, InputAdornment,
+  Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert,
+  Autocomplete
+} from '@mui/material';
+import Tooltip from '@mui/material/Tooltip';
+import {
+  Search as SearchIcon,
+  Add as AddIcon,
+  History as HistoryIcon,
+  Edit as EditIcon,
+  PictureAsPdf as PdfIcon,
+  Paid as PaidIcon,
+  Assignment as AssignmentIcon,
+  LocalShipping as ShippingIcon,
+  Person as PersonIcon,
+  Event as EventIcon,
+  Warning as WarningIcon,
+  Delete as DeleteIcon
+} from '@mui/icons-material';
 
 import ViaticosModal from './ViaticosModal';
 
@@ -15,7 +37,8 @@ const MemorandumComision = () => {
     tipo_transporte: '',
     id_vehiculo: '',
     id_firma: '',
-    observaciones: ''
+    observaciones: '',
+    id_memorandum_comision: null
   });
 
   const [actividades, setActividades] = useState([]);
@@ -24,8 +47,32 @@ const MemorandumComision = () => {
   const [firmasDisponibles, setFirmasDisponibles] = useState([]);
   const [memorandums, setMemorandums] = useState([]);
   const [busquedaFolio, setBusquedaFolio] = useState('');
-  const [busquedaEmpleado, setBusquedaEmpleado] = useState('');
   const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const [confirmDialog, setConfirmDialog] = useState({ open: false, id: null });
+  const [page, setPage] = useState(0);
+  const [rowsPerPage] = useState(5);
+
+  const handleDelete = async () => {
+    setActionLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      // Assuming the delete route will be implemented at /api/memorandum/:id
+      await axios.delete(`${API_BASE_URL}/api/memorandum/${confirmDialog.id}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      setSnackbar({ open: true, message: 'Memorandum eliminado con éxito', severity: 'success' });
+      setConfirmDialog({ open: false, id: null });
+      cargarMemorandums();
+    } catch (error) {
+      console.error('Error eliminando memorandum:', error);
+      setSnackbar({ open: true, message: 'Error al eliminar el memorandum', severity: 'error' });
+    } finally {
+      setActionLoading(false);
+    }
+  };
 
   useEffect(() => {
     cargarActividades();
@@ -37,8 +84,14 @@ const MemorandumComision = () => {
   useEffect(() => {
     if (formData.id_empleado) {
       cargarFirmasPorEmpleado(formData.id_empleado);
+    } else {
+      setFirmasDisponibles([]);
     }
   }, [formData.id_empleado]);
+
+  useEffect(() => {
+    setPage(0);
+  }, [busquedaFolio]);
 
   const cargarActividades = async () => {
     try {
@@ -93,18 +146,8 @@ const MemorandumComision = () => {
       const response = await axios.get(`${API_BASE_URL}/api/firmas/empleado/${id_empleado}`);
       const firmas = response.data.firmas;
       setFirmasDisponibles(firmas);
-
-      // Auto-seleccionar la primera firma si existe
       if (firmas.length > 0) {
-        setFormData(prev => ({
-          ...prev,
-          id_firma: firmas[0].id_firma
-        }));
-      } else {
-        setFormData(prev => ({
-          ...prev,
-          id_firma: ''
-        }));
+        setFormData(prev => ({ ...prev, id_firma: firmas[0].id_firma }));
       }
     } catch (error) {
       console.error('Error cargando firmas:', error);
@@ -116,389 +159,689 @@ const MemorandumComision = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Validar que el empleado seleccionado coincida con el texto del campo
-    if (formData.id_empleado) {
-      const empleadoSeleccionado = empleados.find(emp => emp.id_empleado === parseInt(formData.id_empleado));
-      if (empleadoSeleccionado) {
-        const nombreCompletoEsperado = `${empleadoSeleccionado.nombres} ${empleadoSeleccionado.apellido1} ${empleadoSeleccionado.apellido2} (${empleadoSeleccionado.lugar_trabajo_nombre || 'Sin lugar asignado'})`;
-        if (busquedaEmpleado !== nombreCompletoEsperado) {
-          alert('⚠️ El texto del empleado no coincide con la selección. Por favor, seleccione un empleado válido de la lista.');
-          return;
-        }
-      }
-    } else {
-      alert('⚠️ Debe seleccionar un empleado válido de la lista.');
+    if (!formData.id_empleado) {
+      setSnackbar({ open: true, message: 'Seleccione un empleado válido', severity: 'warning' });
       return;
     }
 
+    setActionLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post(`${API_BASE_URL}/api/memorandum`, formData, {
+      const isEditing = formData.id_memorandum_comision !== null;
+
+      const url = isEditing
+        ? `${API_BASE_URL}/api/memorandum/${formData.id_memorandum_comision}`
+        : `${API_BASE_URL}/api/memorandum`;
+
+      const method = isEditing ? 'put' : 'post';
+
+      const response = await axios[method](url, formData, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
       if (response.data.success) {
-        alert('Memorandum/Comisión guardado exitosamente');
-        setFormData({
-          id_actividad: '',
-          id_empleado: '',
-          periodo_inicio: '',
-          periodo_fin: '',
-          tipo_transporte: '',
-          id_vehiculo: '',
-          id_firma: '',
-          observaciones: ''
+        setSnackbar({
+          open: true,
+          message: isEditing ? 'Memorandum actualizado con éxito' : 'Memorandum guardado con éxito',
+          severity: 'success'
         });
-        setBusquedaEmpleado(''); // Limpiar búsqueda de empleado
-        setFirmasDisponibles([]);
-        cargarMemorandums(); // Recargar tabla
+        resetForm();
+        cargarMemorandums();
       }
     } catch (error) {
-      console.error('Error guardando memorandum:', error);
-      alert('Error al guardar el memorandum');
+      console.error('Error guardando/actualizando memorandum:', error);
+      setSnackbar({ open: true, message: 'Error al procesar el memorandum', severity: 'error' });
+    } finally {
+      setActionLoading(false);
     }
   };
 
-  // Filtrar memorandums por búsqueda
+  const handleEdit = (memo) => {
+    setFormData({
+      id_actividad: memo.id_actividad,
+      id_empleado: memo.id_empleado,
+      periodo_inicio: memo.periodo_inicio.split('T')[0],
+      periodo_fin: memo.periodo_fin.split('T')[0],
+      tipo_transporte: memo.tipo_transporte,
+      id_vehiculo: memo.id_vehiculo || '',
+      id_firma: memo.id_firma,
+      observaciones: memo.observaciones || '',
+      id_memorandum_comision: memo.id_memorandum_comision
+    });
+    setShowForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const resetForm = () => {
+    setFormData({
+      id_actividad: '',
+      id_empleado: '',
+      periodo_inicio: '',
+      periodo_fin: '',
+      tipo_transporte: '',
+      id_vehiculo: '',
+      id_firma: '',
+      observaciones: '',
+      id_memorandum_comision: null
+    });
+    setFirmasDisponibles([]);
+    setShowForm(false);
+  };
+
+  const inputStyles = {
+    '& .MuiOutlinedInput-root': {
+      bgcolor: '#1e293b',
+      '& fieldset': { borderColor: '#334155', borderWidth: 2 },
+      '&:hover fieldset': { borderColor: '#38bdf8' },
+      '&.Mui-focused fieldset': { borderColor: '#38bdf8' },
+      '& input, & textarea': {
+        color: '#f8fafc',
+        fontWeight: 600,
+        bgcolor: 'transparent !important',
+        '&:-webkit-autofill': {
+          WebkitBoxShadow: '0 0 0 100px #1e293b inset !important',
+          WebkitTextFillColor: '#f8fafc !important',
+        },
+        '&:focus': { bgcolor: 'transparent !important' }
+      },
+      '&.Mui-focused': { bgcolor: '#1e293b !important' }
+    },
+    '& .MuiInputLabel-root': { color: '#64748b', fontWeight: 600 },
+    '& .MuiInputLabel-root.Mui-focused': { color: '#38bdf8' },
+    '& .MuiSelect-icon': { color: '#64748b' }
+  };
+
   const memorandumsFiltrados = memorandums.filter(memo => {
-    const id = memo.id_memorandum_comision || memo.id_memorandum; // Fallback por si acaso
-    return id ? id.toString().includes(busquedaFolio) : false;
+    const id = memo.id_memorandum_comision?.toString() || '';
+    const folio = memo.folio?.toString() || '';
+    return id.includes(busquedaFolio) || folio.includes(busquedaFolio);
   });
 
+  const visibleRows = useMemo(
+    () =>
+      memorandumsFiltrados.slice(
+        page * rowsPerPage,
+        page * rowsPerPage + rowsPerPage,
+      ),
+    [memorandumsFiltrados, page, rowsPerPage],
+  );
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
   return (
-    <div className="memorandum-container">
-      <h2>Memorandum y Comisión</h2>
+    <Box sx={{
+      maxWidth: '100%',
+      margin: '0 auto',
+      p: 3,
+      fontFamily: "'Inter', sans-serif",
+      bgcolor: '#0f172a',
+      minHeight: '100vh',
+      color: '#f8fafc'
+    }}>
+      {/* Header section - Removed flex from here to use more specific list-header style */}
+      <Box sx={{ mb: 2 }}>
+        <Typography variant="h4" sx={{ fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.025em', display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <AssignmentIcon sx={{ fontSize: 40, color: '#38bdf8' }} />
+          Gestión de Memorandum
+        </Typography>
+        <Typography variant="body2" sx={{ color: '#94a3b8', fontWeight: 500, mt: 0.5 }}>
+          Oficios de Comisión • <span style={{ color: '#38bdf8' }}>Administración</span>
+        </Typography>
+      </Box>
 
-      <form onSubmit={handleSubmit} className="memorandum-form">
-        <div className="form-group">
-          <label>Actividad</label>
-          <select
-            name="id_actividad"
-            value={formData.id_actividad}
-            onChange={handleChange}
-            required
+      {/* List Header: Button & Search aligned on same line */}
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        mb: 4,
+        mt: 2,
+        flexWrap: 'wrap',
+        gap: 2
+      }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setShowForm(!showForm)}
+            sx={{
+              bgcolor: '#38bdf8',
+              color: '#0f172a',
+              fontWeight: 800,
+              px: 3,
+              height: 40,
+              borderRadius: '10px',
+              textTransform: 'none',
+              boxShadow: '0 4px 6px -1px rgba(56, 189, 248, 0.4)',
+              '&:hover': { bgcolor: '#7dd3fc', transform: 'translateY(-1px)' },
+              transition: 'all 0.2s',
+              whiteSpace: 'nowrap'
+            }}
           >
-            <option value="">Seleccione una actividad</option>
-            {actividades.map(actividad => (
-              <option key={actividad.id_actividad} value={actividad.id_actividad}>
-                {actividad.motivo} - {actividad.fecha} ({actividad.tipo})
-              </option>
-            ))}
-          </select>
-        </div>
+            {showForm ? 'Ocultar Formulario' : (formData.id_memorandum_comision ? 'Editando Memorandum' : 'Nuevo Memorandum')}
+          </Button>
+          <Typography variant="h5" sx={{ fontWeight: 800, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: 1 }}>
+            <HistoryIcon sx={{ color: '#38bdf8' }} /> Historial de Comisiones
+          </Typography>
+        </Box>
 
-        <div className="form-group">
-          <label>Empleado Comisionado</label>
-          <input
-            type="text"
-            list="empleados-list"
-            placeholder="🔍 Escriba para buscar empleado por nombre o lugar de trabajo..."
-            value={busquedaEmpleado}
-            onChange={(e) => {
-              const value = e.target.value;
-              setBusquedaEmpleado(value);
+        <TextField
+          placeholder="Filtrar por folio..."
+          value={busquedaFolio}
+          onChange={(e) => setBusquedaFolio(e.target.value)}
+          size="small"
+          InputProps={{
+            startAdornment: <InputAdornment position="start"><SearchIcon sx={{ color: '#64748b' }} /></InputAdornment>,
+            sx: {
+              height: 40,
+              borderRadius: '12px',
+              bgcolor: '#1e293b',
+              color: '#f8fafc',
+              '& fieldset': { borderColor: '#334155' }
+            }
+          }}
+          sx={{ minWidth: 280 }}
+        />
+      </Box>
 
-              // Si el campo está vacío, limpiar la selección
-              if (!value || value.trim() === '') {
-                setFormData(prev => ({
-                  ...prev,
-                  id_empleado: ''
-                }));
-                return;
-              }
+      {/* Capture Form */}
+      {showForm && (
+        <Paper elevation={0} sx={{
+          p: 4,
+          borderRadius: '24px',
+          bgcolor: '#1e293b',
+          border: '1px solid #334155',
+          mb: 5,
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3)'
+        }}>
+          <form onSubmit={handleSubmit}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
+              <FormControl fullWidth sx={inputStyles}>
+                <InputLabel>Actividad Relacionada</InputLabel>
+                <Select
+                  name="id_actividad"
+                  value={actividades.some(a => a.id_actividad === formData.id_actividad) ? formData.id_actividad : ''}
+                  onChange={handleChange}
+                  label="Actividad Relacionada"
+                  required
+                  sx={{ borderRadius: '12px' }}
+                >
+                  <MenuItem value="" disabled>Seleccione una actividad</MenuItem>
+                  {actividades.map(act => (
+                    <MenuItem key={act.id_actividad} value={act.id_actividad}>
+                      {act.motivo} - {new Date(act.fecha).toLocaleDateString()}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
 
-              // Buscar si hay un empleado que coincida exactamente
-              const empleadoEncontrado = empleados.find(emp => {
-                const nombreCompleto = `${emp.nombres} ${emp.apellido1} ${emp.apellido2} (${emp.lugar_trabajo_nombre || 'Sin lugar asignado'})`;
-                return nombreCompleto === value;
-              });
+              <Autocomplete
+                options={empleados}
+                getOptionLabel={(option) => `${option.nombres} ${option.apellido1} ${option.apellido2}`}
+                value={empleados.find(e => e.id_empleado === formData.id_empleado) || null}
+                onChange={(event, newValue) => {
+                  setFormData(prev => ({ ...prev, id_empleado: newValue ? newValue.id_empleado : '' }));
+                }}
+                renderOption={(props, option) => (
+                  <Box component="li" {...props} sx={{ bgcolor: '#1e293b !important', color: '#f8fafc' }}>
+                    <Box>
+                      <Typography variant="body2" sx={{ fontWeight: 700 }}>{option.nombres} {option.apellido1} {option.apellido2}</Typography>
+                      <Typography variant="caption" sx={{ color: '#94a3b8' }}>{option.lugar_trabajo_nombre || 'Sin lugar asignado'}</Typography>
+                    </Box>
+                  </Box>
+                )}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Empleado Comisionado"
+                    required
+                    sx={inputStyles}
+                  />
+                )}
+                sx={{ '& .MuiAutocomplete-paper': { bgcolor: '#1e293b' } }}
+              />
 
-              // Solo actualizar si se encontró un empleado válido
-              if (empleadoEncontrado) {
-                setFormData(prev => ({
-                  ...prev,
-                  id_empleado: empleadoEncontrado.id_empleado
-                }));
-              } else {
-                // Si no coincide exactamente, limpiar el id pero mantener el texto para seguir buscando
-                setFormData(prev => ({
-                  ...prev,
-                  id_empleado: ''
-                }));
-              }
-            }}
-            onBlur={(e) => {
-              // Al perder el foco, verificar si hay una selección válida
-              const value = e.target.value;
-              const empleadoEncontrado = empleados.find(emp => {
-                const nombreCompleto = `${emp.nombres} ${emp.apellido1} ${emp.apellido2} (${emp.lugar_trabajo_nombre || 'Sin lugar asignado'})`;
-                return nombreCompleto === value;
-              });
+              <TextField
+                label="Inicio del Período"
+                type="date"
+                name="periodo_inicio"
+                value={formData.periodo_inicio}
+                onChange={handleChange}
+                required
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+                sx={inputStyles}
+              />
 
-              // Si no hay selección válida, limpiar el campo
-              if (!empleadoEncontrado && value) {
-                // Opcional: puedes descomentar esto si quieres que se limpie automáticamente
-                // setBusquedaEmpleado('');
-              }
-            }}
-            required
-            style={{
-              padding: '8px 12px',
-              border: formData.id_empleado
-                ? '2px solid #4caf50'
-                : busquedaEmpleado && !formData.id_empleado
-                  ? '2px solid #ff9800'
-                  : '1px solid #ddd',
-              borderRadius: '4px',
-              width: '100%',
-              fontSize: '14px',
-              backgroundColor: formData.id_empleado
-                ? '#f1f8f4'
-                : busquedaEmpleado && !formData.id_empleado
-                  ? '#fff8e1'
-                  : 'white'
-            }}
-          />
-          <datalist id="empleados-list">
-            {empleados
-              .filter(empleado => {
-                if (!busquedaEmpleado) return true;
-                const searchTerm = busquedaEmpleado.toLowerCase();
-                const nombreCompleto = `${empleado.nombres} ${empleado.apellido1} ${empleado.apellido2}`.toLowerCase();
-                const lugarTrabajo = (empleado.lugar_trabajo_nombre || 'Sin lugar asignado').toLowerCase();
-                return nombreCompleto.includes(searchTerm) || lugarTrabajo.includes(searchTerm);
-              })
-              .map(empleado => (
-                <option
-                  key={empleado.id_empleado}
-                  value={`${empleado.nombres} ${empleado.apellido1} ${empleado.apellido2} (${empleado.lugar_trabajo_nombre || 'Sin lugar asignado'})`}
+              <TextField
+                label="Fin del Período"
+                type="date"
+                name="periodo_fin"
+                value={formData.periodo_fin}
+                onChange={handleChange}
+                required
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+                sx={inputStyles}
+              />
+
+              <FormControl fullWidth sx={inputStyles}>
+                <InputLabel>Tipo de Transporte</InputLabel>
+                <Select
+                  name="tipo_transporte"
+                  value={formData.tipo_transporte}
+                  onChange={handleChange}
+                  label="Tipo de Transporte"
+                  required
+                  sx={{ borderRadius: '12px' }}
+                >
+                  <MenuItem value="publico">Público</MenuItem>
+                  <MenuItem value="oficial">Oficial</MenuItem>
+                  <MenuItem value="aereo">Aéreo</MenuItem>
+                </Select>
+              </FormControl>
+
+              {formData.tipo_transporte === 'oficial' && (
+                <FormControl fullWidth sx={inputStyles}>
+                  <InputLabel>Vehículo Oficial</InputLabel>
+                  <Select
+                    name="id_vehiculo"
+                    value={vehiculos.some(v => v.id_vehiculo === formData.id_vehiculo) ? formData.id_vehiculo : ''}
+                    onChange={handleChange}
+                    label="Vehículo Oficial"
+                    required
+                    sx={{ borderRadius: '12px' }}
+                  >
+                    {vehiculos.map(veh => (
+                      <MenuItem key={veh.id_vehiculo} value={veh.id_vehiculo}>
+                        {veh.marca_de_vehiculo} {veh.modelo} - {veh.placas_actuales}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
+
+              <FormControl fullWidth sx={inputStyles}>
+                <InputLabel>Firma que Autoriza</InputLabel>
+                <Select
+                  name="id_firma"
+                  value={firmasDisponibles.some(f => f.id_firma === formData.id_firma) ? formData.id_firma : ''}
+                  onChange={handleChange}
+                  label="Firma que Autoriza"
+                  required
+                  sx={{ borderRadius: '12px' }}
+                  disabled={loading || firmasDisponibles.length === 0}
+                >
+                  {firmasDisponibles.map(f => (
+                    <MenuItem key={f.id_firma} value={f.id_firma}>
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 700 }}>{f.nombre_firma} - {f.cargo_firma}</Typography>
+                        <Typography variant="caption" sx={{ color: '#94a3b8' }}>{f.tipo_asignacion === 'area' ? 'Firma de Área' : 'Firma Adicional'}</Typography>
+                      </Box>
+                    </MenuItem>
+                  ))}
+                </Select>
+                {firmasDisponibles.length === 0 && formData.id_empleado && !loading && (
+                  <Typography variant="caption" color="error" sx={{ mt: 1, fontWeight: 600 }}>
+                    ⚠️ Empleado sin firmas asignadas
+                  </Typography>
+                )}
+              </FormControl>
+
+              <Box sx={{ gridColumn: { md: 'span 2' } }}>
+                <TextField
+                  name="observaciones"
+                  label="Observaciones"
+                  value={formData.observaciones}
+                  onChange={handleChange}
+                  multiline
+                  rows={2}
+                  fullWidth
+                  placeholder="Detalles adicionales de la comisión..."
+                  sx={inputStyles}
                 />
-              ))}
-          </datalist>
-          {formData.id_empleado && (
-            <small style={{ color: '#4caf50', fontSize: '12px', marginTop: '4px', display: 'block' }}>
-              ✓ Empleado seleccionado correctamente
-            </small>
-          )}
-          {busquedaEmpleado && !formData.id_empleado && (
-            <small style={{ color: '#ff9800', fontSize: '12px', marginTop: '4px', display: 'block' }}>
-              ⚠️ Debe seleccionar un empleado de la lista
-            </small>
-          )}
-        </div>
+              </Box>
+            </Box>
 
-        <div className="form-row">
-          <div className="form-group">
-            <label>Período Inicio</label>
-            <input
-              type="date"
-              name="periodo_inicio"
-              value={formData.periodo_inicio}
-              onChange={handleChange}
-              required
-            />
-          </div>
+            <Box sx={{ mt: 5, display: 'flex', gap: 2, justifyContent: 'center' }}>
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={actionLoading || (formData.id_empleado && firmasDisponibles.length === 0)}
+                startIcon={actionLoading ? <CircularProgress size={20} color="inherit" /> : <AddIcon />}
+                sx={{
+                  bgcolor: '#38bdf8',
+                  color: '#0f172a',
+                  fontWeight: 800,
+                  px: 6,
+                  py: 1.5,
+                  borderRadius: '14px',
+                  textTransform: 'none',
+                  boxShadow: '0 10px 15px -3px rgba(56, 189, 248, 0.4)',
+                  '&:hover': { bgcolor: '#7dd3fc', transform: 'translateY(-2px)' },
+                  '&:disabled': { bgcolor: '#334155', color: '#64748b' }
+                }}
+              >
+                {actionLoading ? 'Guardando...' : (formData.id_memorandum_comision ? 'Actualizar Memorandum' : 'Generar Memorandum')}
+              </Button>
+              <Button onClick={resetForm} sx={{ color: '#94a3b8', fontWeight: 600, textTransform: 'none' }}>
+                Cancelar
+              </Button>
+            </Box>
+          </form>
+        </Paper>
+      )}
 
-          <div className="form-group">
-            <label>Período Fin</label>
-            <input
-              type="date"
-              name="periodo_fin"
-              value={formData.periodo_fin}
-              onChange={handleChange}
-              required
-            />
-          </div>
-        </div>
+      {/* List Header */}
+      <Typography variant="h5" sx={{ fontWeight: 800, color: '#f8fafc', mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
+        <HistoryIcon sx={{ color: '#38bdf8' }} /> Historial de Comisiones
+      </Typography>
 
-        <div className="form-group">
-          <label>Tipo de Transporte</label>
-          <select
-            name="tipo_transporte"
-            value={formData.tipo_transporte}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Seleccione tipo de transporte</option>
-            <option value="publico">Público</option>
-            <option value="oficial">Oficial</option>
-            <option value="aereo">Aéreo</option>
-          </select>
-        </div>
-
-        {formData.tipo_transporte === 'oficial' && (
-          <div className="form-group">
-            <label>Vehículo Oficial</label>
-            <select
-              name="id_vehiculo"
-              value={formData.id_vehiculo}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Seleccione un vehículo</option>
-              {vehiculos.map(vehiculo => (
-                <option key={vehiculo.id_vehiculo} value={vehiculo.id_vehiculo}>
-                  {vehiculo.marca_de_vehiculo} {vehiculo.modelo} - {vehiculo.placas_actuales}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        <div className="form-group">
-          <label>Observaciones</label>
-          <textarea
-            name="observaciones"
-            value={formData.observaciones}
-            onChange={handleChange}
-            rows="3"
-            placeholder="Observaciones adicionales (opcional)"
-          />
-        </div>
-
-        {firmasDisponibles.length > 0 && (
-          <div className="form-group">
-            <label>Firma que Autoriza</label>
-            <select
-              name="id_firma"
-              value={formData.id_firma}
-              onChange={handleChange}
-              required
-              className="select-firma"
-            >
-              {firmasDisponibles.map(firma => (
-                <option key={firma.id_firma} value={firma.id_firma}>
-                  {firma.nombre_firma} - {firma.cargo_firma} ({firma.tipo_asignacion === 'area' ? 'Área' : 'Adicional'})
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        {formData.id_empleado && firmasDisponibles.length === 0 && !loading && (
-          <div className="error-message">
-            <p>⚠️ No hay firmas asignadas para este empleado</p>
-          </div>
-        )}
-
-        <div className="form-actions">
-          <button
-            type="submit"
-            className="btn-primary"
-            disabled={firmasDisponibles.length === 0}
-          >
-            Guardar Memorandum
-          </button>
-          <button
-            type="button"
-            className="btn-secondary"
-            onClick={() => {
-              setFormData({
-                id_actividad: '',
-                id_empleado: '',
-                periodo_inicio: '',
-                periodo_fin: '',
-                tipo_transporte: '',
-                id_vehiculo: '',
-                id_firma: '',
-                observaciones: ''
-              });
-              setBusquedaEmpleado(''); // Limpiar búsqueda de empleado
-              setFirmasDisponibles([]);
-            }}
-          >
-            Limpiar
-          </button>
-        </div>
-      </form>
-
-      {/* Tabla de Memorandums */}
-      <div className="actividades-table-container">
-        <div className="table-header">
-          <h3>Memorandums y Comisiones Recientes</h3>
-          <div className="search-box">
-            {/* Busqueda simple por ahora */}
-          </div>
-        </div>
-
-        <div className="table-responsive">
-          <table>
-            <thead>
-              <tr>
-                <th style={{ textAlign: 'center' }}>Folio</th>
-                <th style={{ textAlign: 'center' }}>Fecha</th>
-                <th style={{ textAlign: 'center' }}>Municipio / Lugar</th>
-                <th style={{ textAlign: 'center' }}>Empleado</th>
-                <th style={{ textAlign: 'center' }}>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {memorandumsFiltrados.length === 0 ? (
-                <tr>
-                  <td colSpan="5" className="no-data" style={{ textAlign: 'center' }}>
-                    No hay memorandums registrados
-                  </td>
-                </tr>
-              ) : (
-                memorandumsFiltrados.map(memo => (
-                  <tr key={memo.id_memorandum_comision}>
-                    <td style={{ textAlign: 'center', fontWeight: 'bold' }}>
-                      {memo.folio || memo.id_memorandum_comision}
-                    </td>
-                    <td style={{ textAlign: 'center' }}>
-                      {new Date(memo.periodo_inicio).toLocaleDateString()}
-                    </td>
-                    <td style={{ textAlign: 'center' }}>
-                      {memo.municipio_nombre || memo.lugar || memo.direccion || 'N/A'}
-                    </td>
-                    <td style={{ textAlign: 'center' }}>
-                      {memo.empleado_nombre}
-                    </td>
-                    <td style={{ textAlign: 'center' }}>
-                      <div className="action-buttons" style={{ justifyContent: 'center', display: 'flex' }}>
-                        <button
-                          className="btn-icon edit"
-                          onClick={() => alert(`Editar folio ${memo.folio || memo.id_memorandum_comision} - Función pendiente de configurar`)}
-                          title="Editar"
+      {/* Row-Card List */}
+      <TableContainer sx={{ pb: 4, overflowX: 'hidden' }}>
+        <Table sx={{ borderCollapse: 'separate', borderSpacing: '0 10px', tableLayout: 'fixed' }}>
+          <TableHead>
+            <TableRow sx={{ '& th': { border: 'none', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.7rem' } }}>
+              <TableCell width="10%" align="center">Folio</TableCell>
+              <TableCell width="15%" align="center">Fecha Comisión</TableCell>
+              <TableCell width="30%" align="center">Información del Comisionado</TableCell>
+              <TableCell width="25%" align="center">Ubicación</TableCell>
+              <TableCell width="20%" align="center">Acciones</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {visibleRows.length === 0 ? (
+              <TableRow sx={{ '&:hover': { bgcolor: 'transparent !important' } }}>
+                <TableCell colSpan={5} align="center" sx={{ border: 'none', py: 10, color: '#475569' }}>
+                  No se encontraron memorandums registrados
+                </TableCell>
+              </TableRow>
+            ) : (
+              visibleRows.map((memo) => (
+                <TableRow
+                  key={memo.id_memorandum_comision}
+                  sx={{
+                    bgcolor: '#1e293b',
+                    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.3)',
+                    transition: 'all 0.2s',
+                    '&:hover': { bgcolor: '#334155', transform: 'translateY(-2px)' },
+                    '& td': { border: 'none' },
+                    '& td:first-of-type': { borderTopLeftRadius: '16px', borderBottomLeftRadius: '16px' },
+                    '& td:last-of-type': { borderTopRightRadius: '16px', borderBottomRightRadius: '16px' }
+                  }}
+                >
+                  <TableCell align="center">
+                    <Typography sx={{ fontWeight: 800, color: '#38bdf8' }}>#{memo.folio || memo.id_memorandum_comision}</Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography sx={{ color: '#f8fafc', fontWeight: 700, fontSize: '0.9rem' }}>
+                      {new Date(memo.periodo_inicio).toLocaleDateString('es-MX', { day: '2-digit', month: 'short' })}
+                    </Typography>
+                    <Typography sx={{ color: '#94a3b8', fontSize: '0.75rem' }}>Inicio Periodo</Typography>
+                  </TableCell>
+                  <TableCell align="center" sx={{ maxWidth: 250 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, justifyContent: 'center' }}>
+                      <PersonIcon sx={{ color: '#64748b', flexShrink: 0 }} />
+                      <Box sx={{ textAlign: 'left', minWidth: 0 }}>
+                        <Typography sx={{
+                          color: '#cbd5e1',
+                          fontWeight: 700,
+                          fontSize: '0.9rem',
+                          lineHeight: 1.2,
+                          wordBreak: 'break-word',
+                          whiteSpace: 'normal'
+                        }}>
+                          {memo.empleado_nombre}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#64748b', display: 'block' }}>
+                          Comisionado
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </TableCell>
+                  <TableCell align="center" sx={{ maxWidth: 220 }}>
+                    <Box sx={{ display: 'inline-block', textAlign: 'left', minWidth: 0 }}>
+                      <Typography sx={{
+                        color: '#cbd5e1',
+                        fontWeight: 600,
+                        fontSize: '0.85rem',
+                        lineHeight: 1.2,
+                        wordBreak: 'break-word',
+                        whiteSpace: 'normal'
+                      }}>
+                        {memo.municipio_nombre || memo.lugar || 'N/A'}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: '#64748b', display: 'block' }}>
+                        Punto de Destino
+                      </Typography>
+                    </Box>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Box sx={{ display: 'flex', justifyContent: 'center', gap: 0.8 }}>
+                      <Tooltip title="Editar">
+                        <IconButton
+                          size="small"
+                          onClick={() => handleEdit(memo)}
+                          sx={{
+                            color: '#64748b',
+                            border: '1px solid #334155',
+                            p: 0.5,
+                            minWidth: 'auto',
+                            width: 'auto',
+                            height: 'auto',
+                            borderRadius: '8px',
+                            '&:hover': { color: '#38bdf8', borderColor: '#38bdf8', bgcolor: 'rgba(56,189,248,0.05)', transform: 'scale(1.1)' },
+                            transition: 'all 0.2s'
+                          }}
                         >
-                          ✎
-                        </button>
-                        <button
-                          className="btn-icon"
-                          onClick={() => alert(`Imprimir folio ${memo.folio || memo.id_memorandum_comision} - Función pendiente de configurar`)}
-                          title="Imprimir"
+                          <EditIcon sx={{ fontSize: 18 }} />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Reporte Memo">
+                        <IconButton
+                          size="small"
+                          sx={{
+                            color: '#64748b',
+                            border: '1px solid #334155',
+                            p: 0.5,
+                            minWidth: 'auto',
+                            width: 'auto',
+                            height: 'auto',
+                            borderRadius: '8px',
+                            '&:hover': { color: '#2dd4bf', borderColor: '#2dd4bf', bgcolor: 'rgba(45,212,191,0.05)', transform: 'scale(1.1)' },
+                            transition: 'all 0.2s'
+                          }}
                         >
-                          🖨️
-                        </button>
-                        <button
-                          className="btn-icon"
+                          <PdfIcon sx={{ fontSize: 18 }} />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Reporte Comisión">
+                        <IconButton
+                          size="small"
+                          sx={{
+                            color: '#64748b',
+                            border: '1px solid #334155',
+                            p: 0.5,
+                            minWidth: 'auto',
+                            width: 'auto',
+                            height: 'auto',
+                            borderRadius: '8px',
+                            '&:hover': { color: '#38bdf8', borderColor: '#38bdf8', bgcolor: 'rgba(56,189,248,0.05)', transform: 'scale(1.1)' },
+                            transition: 'all 0.2s'
+                          }}
+                        >
+                          <PdfIcon sx={{ fontSize: 18 }} />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Gastos / Viáticos">
+                        <IconButton
+                          size="small"
                           onClick={() => {
                             setSelectedMemoForViaticos(memo);
                             setShowViaticosModal(true);
                           }}
-                          title="Agregar Viáticos"
-                          style={{ marginLeft: '5px', backgroundColor: '#e91e63', color: 'white' }}
+                          sx={{
+                            color: '#f8fafc',
+                            bgcolor: '#e91e63',
+                            border: '1px solid transparent',
+                            p: 0.5,
+                            minWidth: 'auto',
+                            width: 'auto',
+                            height: 'auto',
+                            borderRadius: '8px',
+                            '&:hover': { bgcolor: '#f06292', transform: 'scale(1.1)' },
+                            transition: 'all 0.2s'
+                          }}
                         >
-                          +
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                          <PaidIcon sx={{ fontSize: 18 }} />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Eliminar">
+                        <IconButton
+                          size="small"
+                          onClick={() => setConfirmDialog({ open: true, id: memo.id_memorandum_comision })}
+                          disabled={actionLoading}
+                          sx={{
+                            color: '#64748b',
+                            border: '1px solid #334155',
+                            p: 0.5,
+                            minWidth: 'auto',
+                            width: 'auto',
+                            height: 'auto',
+                            borderRadius: '8px',
+                            '&:hover': { color: '#f87171', borderColor: '#f87171', bgcolor: 'rgba(248,113,113,0.05)', transform: 'scale(1.1)' },
+                            transition: 'all 0.2s'
+                          }}
+                        >
+                          <DeleteIcon sx={{ fontSize: 18 }} />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      {/* Pagination Minimalista Custom Dark */}
+      {memorandumsFiltrados.length > 0 && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 4, gap: 1 }}>
+          <Button
+            onClick={(e) => handleChangePage(e, Math.max(0, page - 1))}
+            disabled={page === 0}
+            variant="text"
+            size="small"
+            sx={{
+              textTransform: 'none',
+              color: '#64748b',
+              minWidth: 'auto',
+              fontWeight: 600,
+              '&:hover': { color: '#f8fafc', bgcolor: 'transparent' },
+              '&.Mui-disabled': { color: '#334155' }
+            }}
+          >
+            Anterior
+          </Button>
+
+          {[...Array(Math.ceil(memorandumsFiltrados.length / rowsPerPage))].map((_, idx) => (
+            <IconButton
+              key={idx}
+              onClick={(e) => handleChangePage(e, idx)}
+              size="small"
+              sx={{
+                width: 32,
+                height: 32,
+                fontSize: '0.85rem',
+                fontWeight: 700,
+                borderRadius: '8px',
+                backgroundColor: page === idx ? '#38bdf8' : 'transparent',
+                color: page === idx ? '#0f172a' : '#64748b',
+                '&:hover': {
+                  backgroundColor: page === idx ? '#7dd3fc' : 'rgba(255,255,255,0.05)',
+                  color: page === idx ? '#0f172a' : '#f8fafc'
+                }
+              }}
+            >
+              {idx + 1}
+            </IconButton>
+          ))}
+
+          <Button
+            onClick={(e) => handleChangePage(e, Math.min(Math.ceil(memorandumsFiltrados.length / rowsPerPage) - 1, page + 1))}
+            disabled={page === Math.ceil(memorandumsFiltrados.length / rowsPerPage) - 1}
+            variant="text"
+            size="small"
+            sx={{
+              textTransform: 'none',
+              color: '#64748b',
+              minWidth: 'auto',
+              fontWeight: 600,
+              '&:hover': { color: '#f8fafc', bgcolor: 'transparent' },
+              '&.Mui-disabled': { color: '#334155' }
+            }}
+          >
+            Siguiente
+          </Button>
+        </Box>
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={confirmDialog.open}
+        onClose={() => !actionLoading && setConfirmDialog({ open: false, id: null })}
+        PaperProps={{
+          sx: {
+            bgcolor: '#1e293b',
+            color: '#f8fafc',
+            borderRadius: '20px',
+            border: '1px solid #334155',
+            p: 1
+          }
+        }}
+      >
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1.5, fontWeight: 800 }}>
+          <WarningIcon sx={{ color: '#f87171' }} /> Confirmar Eliminación
+        </DialogTitle>
+        <DialogContent>
+          <Typography sx={{ color: '#94a3b8', fontWeight: 500 }}>
+            ¿Estás seguro de que deseas eliminar el memorandum con folio <strong>#{confirmDialog.id}</strong>? Esta acción no se puede deshacer.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, gap: 1 }}>
+          <Button
+            onClick={() => setConfirmDialog({ open: false, id: null })}
+            disabled={actionLoading}
+            sx={{ color: '#94a3b8', fontWeight: 700, textTransform: 'none' }}
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleDelete}
+            disabled={actionLoading}
+            variant="contained"
+            sx={{
+              bgcolor: '#f87171',
+              color: '#fff',
+              fontWeight: 800,
+              borderRadius: '12px',
+              textTransform: 'none',
+              px: 3,
+              '&:hover': { bgcolor: '#ef4444' }
+            }}
+          >
+            {actionLoading ? <CircularProgress size={20} color="inherit" /> : 'Sí, Eliminar'}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {showViaticosModal && selectedMemoForViaticos && (
         <ViaticosModal
@@ -508,7 +851,30 @@ const MemorandumComision = () => {
           idEmpleado={selectedMemoForViaticos.id_empleado}
         />
       )}
-    </div>
+
+      {/* Notification System */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={5000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{
+            bgcolor: snackbar.severity === 'success' ? '#1e293b' : '#3c0a0a',
+            color: snackbar.severity === 'success' ? '#22c55e' : '#f87171',
+            border: `1px solid ${snackbar.severity === 'success' ? '#22c55e' : '#f87171'}`,
+            borderRadius: '16px',
+            fontWeight: 600,
+            '& .MuiAlert-icon': { color: 'inherit' }
+          }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </Box>
   );
 };
 

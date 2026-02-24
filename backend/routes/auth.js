@@ -18,13 +18,13 @@ router.post('/login', async (req, res) => {
 
     const user = await pool.query('SELECT * FROM usuarios WHERE usuario = $1 AND esta_borrado = false', [usuario]);
     console.log('User found:', user.rows.length > 0 ? 'YES' : 'NO');
-    
+
     if (user.rows.length === 0) {
       return res.status(400).json({ message: 'Usuario no encontrado' });
     }
 
     console.log('Stored password:', user.rows[0].contraseña);
-    
+
     // Verificar si es hash de bcrypt o texto plano
     let validPassword = false;
     if (user.rows[0].contraseña.startsWith('$2a$') || user.rows[0].contraseña.startsWith('$2b$')) {
@@ -34,9 +34,9 @@ router.post('/login', async (req, res) => {
       // Es texto plano
       validPassword = password === user.rows[0].contraseña;
     }
-    
+
     console.log('Password valid:', validPassword);
-    
+
     if (!validPassword) {
       return res.status(400).json({ message: 'Contraseña incorrecta' });
     }
@@ -51,6 +51,7 @@ router.post('/login', async (req, res) => {
       token,
       user: {
         id: user.rows[0].id_usuario,
+        id_empleado: user.rows[0].id_empleado,
         nombres: user.rows[0].nombres,
         apellidos: user.rows[0].apellidos,
         usuario: user.rows[0].usuario,

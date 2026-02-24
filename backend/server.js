@@ -28,6 +28,8 @@ app.use('/api/empleados', empleadosRoutes);
 app.use('/api/vehiculos', require('./routes/vehiculos'));
 app.use('/api/tarifas', require('./routes/tarifas'));
 app.use('/api/viaticos', require('./routes/viaticos'));
+app.use('/api/gastos-globales', require('./routes/gastosGlobales'));
+app.use('/api/tramites', require('./routes/tramites'));
 
 app.get('/', (req, res) => {
   res.json({ message: 'API Sistema de Viáticos funcionando' });

@@ -1,18 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import Tarifas from './Tarifas';
 import {
   Drawer, List, ListItemButton, ListItemIcon, ListItemText, Collapse,
-  CssBaseline, AppBar, Toolbar, Typography, Box, Avatar, Button, IconButton, Tooltip
+  CssBaseline, AppBar, Toolbar, Typography, Box, Avatar, Button, IconButton, Tooltip, Paper
 } from '@mui/material';
 import {
-  Book, People, DirectionsCar, Description, Receipt, AccountBalanceWallet, CreditCard, AccountBalance,
-  Assignment, Send, CheckCircle, BarChart, ExpandLess, ExpandMore, Menu as MenuIcon, ChevronLeft
+  Book, People, DirectionsCar, Description, Receipt, AccountBalanceWallet, AccountBalance,
+  Assignment, Send, CheckCircle, BarChart, ExpandLess, ExpandMore, Menu as MenuIcon, ChevronLeft,
+  AccessTime, AttachMoney, CalendarMonth
 } from '@mui/icons-material';
 import Actividad from './Actividad';
 import MemorandumComision from './MemorandumComision';
 import GestionFirmas from './GestionFirmas';
 import CuentaPersonal from './CuentaPersonal';
-import CapturaVehiculos from './CapturaVehiculos';
+import Vehiculos from './Vehiculos';
+import Tramites from './Tramites';
 
 const drawerWidth = 240;
 const drawerWidthCollapsed = 72; // Width when collapsed
@@ -54,6 +57,32 @@ const Dashboard = ({ user, setUser, handleLogout }) => {
     return localStorage.getItem('currentView') || null;
   });
 
+  const [vehiculoEditar, setVehiculoEditar] = useState(null);
+  const [dateTime, setDateTime] = useState(new Date());
+  const [exchangeRate, setExchangeRate] = useState(null);
+
+  // Clock Effect
+  useEffect(() => {
+    const timer = setInterval(() => setDateTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Exchange Rate Effect
+  useEffect(() => {
+    const fetchRate = async () => {
+      try {
+        // Using a free rate API
+        const response = await axios.get('https://open.er-api.com/v6/latest/USD');
+        if (response.data && response.data.rates && response.data.rates.MXN) {
+          setExchangeRate(response.data.rates.MXN.toFixed(2));
+        }
+      } catch (error) {
+        console.error('Error fetching exchange rate:', error);
+      }
+    };
+    fetchRate();
+  }, []);
+
   const menuStructure = {
     catalogos: {
       title: 'Catálogos',
@@ -63,13 +92,7 @@ const Dashboard = ({ user, setUser, handleLogout }) => {
           title: 'Personal',
           subitems: { imprimir: 'Imprimir' }
         },
-        vehiculos: {
-          title: 'Vehículos',
-          subitems: {
-            captura: 'Captura',
-            imprimir: 'Imprimir'
-          }
-        },
+        vehiculos: { title: 'Vehículos' },
         firmas: { title: 'Firmas' }
       }
     },
@@ -79,7 +102,6 @@ const Dashboard = ({ user, setUser, handleLogout }) => {
         cuenta_personal: { title: 'Cuenta Personal' },
         actividad: { title: 'Actividad' },
         memo: { title: 'Memo' },
-        comision: { title: 'Comisión' },
         tramite: { title: 'Trámite' }
       }
     },
@@ -122,7 +144,18 @@ const Dashboard = ({ user, setUser, handleLogout }) => {
         return (
           <React.Fragment key={fullKey}>
             <Tooltip title={!sidebarOpen ? item.title : ''} placement="right">
-              <ListItemButton onClick={() => handleClick(itemKey)} sx={{ minHeight: 48, justifyContent: sidebarOpen ? 'initial' : 'center', px: 2.5 }}>
+              <ListItemButton
+                onClick={() => handleClick(itemKey)}
+                sx={{
+                  minHeight: 48,
+                  justifyContent: sidebarOpen ? 'initial' : 'center',
+                  px: 2.5,
+                  '&:hover': {
+                    bgcolor: 'rgba(56, 189, 248, 0.08)',
+                    '& .MuiListItemIcon-root, & .MuiListItemText-primary': { color: '#38bdf8' }
+                  }
+                }}
+              >
                 <ListItemIcon sx={{ minWidth: 0, mr: sidebarOpen ? 3 : 'auto', justifyContent: 'center' }}>
                   {menuIcons[itemKey]}
                 </ListItemIcon>
@@ -135,10 +168,24 @@ const Dashboard = ({ user, setUser, handleLogout }) => {
                 {Object.entries(item.subitems).map(([subitemKey, subitemTitle]) => (
                   <ListItemButton
                     key={`${fullKey}-${subitemKey}`}
-                    sx={{ pl: sidebarOpen ? 4 : 2, minHeight: 48, justifyContent: 'center' }}
+                    sx={{
+                      pl: sidebarOpen ? 4 : 2,
+                      minHeight: 48,
+                      justifyContent: 'center',
+                      '&:hover': {
+                        bgcolor: 'rgba(56, 189, 248, 0.08)',
+                        '& .MuiListItemText-primary': { color: '#38bdf8' }
+                      }
+                    }}
                     onClick={() => handleItemClick(`${itemKey}-${subitemKey}`)}
                   >
-                    <ListItemText primary={subitemTitle} sx={{ opacity: sidebarOpen ? 1 : 0.7 }} />
+                    <ListItemText
+                      primary={subitemTitle}
+                      sx={{
+                        opacity: sidebarOpen ? 1 : 0.7,
+                        '& .MuiTypography-root': { fontWeight: 600, fontSize: '0.85rem' }
+                      }}
+                    />
                   </ListItemButton>
                 ))}
               </List>
@@ -148,11 +195,38 @@ const Dashboard = ({ user, setUser, handleLogout }) => {
       }
       return (
         <Tooltip key={fullKey} title={!sidebarOpen ? item.title : ''} placement="right">
-          <ListItemButton onClick={() => handleItemClick(itemKey)} sx={{ minHeight: 48, justifyContent: sidebarOpen ? 'initial' : 'center', px: 2.5 }}>
-            <ListItemIcon sx={{ minWidth: 0, mr: sidebarOpen ? 3 : 'auto', justifyContent: 'center' }}>
+          <ListItemButton
+            onClick={() => handleItemClick(itemKey)}
+            sx={{
+              minHeight: 48,
+              justifyContent: sidebarOpen ? 'initial' : 'center',
+              px: 2.5,
+              bgcolor: currentView === itemKey ? 'rgba(56, 189, 248, 0.12)' : 'transparent',
+              borderLeft: currentView === itemKey ? '4px solid #38bdf8' : '4px solid transparent',
+              '&:hover': {
+                bgcolor: 'rgba(56, 189, 248, 0.08)',
+                '& .MuiListItemIcon-root, & .MuiListItemText-primary': { color: '#38bdf8' }
+              }
+            }}
+          >
+            <ListItemIcon sx={{
+              minWidth: 0,
+              mr: sidebarOpen ? 3 : 'auto',
+              justifyContent: 'center',
+              color: currentView === itemKey ? '#38bdf8' : '#64748b'
+            }}>
               {menuIcons[itemKey]}
             </ListItemIcon>
-            <ListItemText primary={item.title} sx={{ opacity: sidebarOpen ? 1 : 0 }} />
+            <ListItemText
+              primary={item.title}
+              sx={{
+                opacity: sidebarOpen ? 1 : 0,
+                '& .MuiTypography-root': {
+                  fontWeight: currentView === itemKey ? 800 : 600,
+                  color: currentView === itemKey ? '#38bdf8' : 'inherit'
+                }
+              }}
+            />
           </ListItemButton>
         </Tooltip>
       );
@@ -160,15 +234,13 @@ const Dashboard = ({ user, setUser, handleLogout }) => {
   };
 
   return (
-    <Box sx={{ display: 'flex', backgroundColor: '#D3D3D3' }}>
+    <Box sx={{ display: 'flex', backgroundColor: '#0f172a', minHeight: '100vh' }}>
       <CssBaseline />
       <AppBar position="fixed" sx={{
         zIndex: (theme) => theme.zIndex.drawer + 1,
-        bgcolor: '#1e3f35',
+        bgcolor: '#0f172a',
         boxShadow: 'none',
-        backgroundImage: 'url("/images/patrones/patron-corazon.png")',
-        backgroundSize: '100px 48px',
-        backgroundRepeat: 'repeat'
+        borderBottom: '1px solid #1e293b'
       }}>
         <Toolbar sx={{ minHeight: '48px !important', px: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -186,8 +258,8 @@ const Dashboard = ({ user, setUser, handleLogout }) => {
             >
               {sidebarOpen ? <ChevronLeft /> : <MenuIcon />}
             </IconButton>
-            <Typography variant="h6" noWrap component="div">
-              Sistema de Viáticos
+            <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 800, letterSpacing: '-0.025em' }}>
+              Sistema de <span style={{ color: '#38bdf8' }}>Viáticos</span>
             </Typography>
           </Box>
           <Box
@@ -214,14 +286,9 @@ const Dashboard = ({ user, setUser, handleLogout }) => {
           }),
           [`& .MuiDrawer-paper`]: {
             width: sidebarOpen ? drawerWidth : drawerWidthCollapsed,
-            backgroundColor: '#1e3f35',
-            backgroundImage: 'url("/images/patrones/patron-corazon.png")',
-            backgroundSize: '110px auto',
-            backgroundRepeat: 'repeat',
-            backgroundPosition: 'center',
-            color: 'white',
-            borderTopRightRadius: '16px',
-            borderBottomRightRadius: '16px',
+            backgroundColor: '#1e293b',
+            color: '#f8fafc',
+            borderRight: '1px solid #334155',
             transition: theme => theme.transitions.create('width', {
               easing: theme.transitions.easing.sharp,
               duration: theme.transitions.duration.enteringScreen,
@@ -235,22 +302,34 @@ const Dashboard = ({ user, setUser, handleLogout }) => {
         <Box sx={{ overflow: 'auto', overflowX: 'hidden' }}>
           {sidebarOpen && (
             <Box sx={{ p: 2, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-              <Avatar sx={{ width: 64, height: 64, mb: 1, bgcolor: '#009688' }}>
+              <Avatar sx={{
+                width: 64,
+                height: 64,
+                mb: 1,
+                bgcolor: '#0f172a',
+                border: '3px solid #38bdf8',
+                boxShadow: '0 0 15px rgba(56, 189, 248, 0.3)'
+              }}>
                 {user.nombres.charAt(0)}{user.apellidos.charAt(0)}
               </Avatar>
-              <Typography variant="subtitle1" noWrap sx={{ width: '100%', textAlign: 'center' }}>{user.nombres}</Typography>
+              <Typography variant="subtitle1" noWrap sx={{ width: '100%', textAlign: 'center', fontWeight: 700, px: 1 }}>{user.nombres}</Typography>
               <Button
-                variant="contained"
+                variant="outlined"
                 size="small"
                 onClick={handleLogout}
                 sx={{
                   mt: 1,
-                  borderRadius: 3,
-                  bgcolor: '#f44336',
+                  borderRadius: 2,
+                  color: '#94a3b8',
+                  borderColor: '#334155',
                   '&:hover': {
-                    bgcolor: '#d32f2f'
+                    bgcolor: 'rgba(244, 67, 54, 0.05)',
+                    borderColor: '#f44336',
+                    color: '#f44336'
                   },
-                  textTransform: 'none'
+                  textTransform: 'none',
+                  fontSize: '0.75rem',
+                  fontWeight: 600
                 }}
               >
                 Cerrar Sesión
@@ -287,7 +366,7 @@ const Dashboard = ({ user, setUser, handleLogout }) => {
           </List>
         </Box>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 0, mt: '48px', backgroundColor: '#D3D3D3', minHeight: '100vh', color: 'black' }}>
+      <Box component="main" sx={{ flexGrow: 1, p: 0, mt: '48px', backgroundColor: '#0f172a', minHeight: 'calc(100vh - 48px)', color: '#f8fafc', overflowY: 'auto' }}>
         {currentView === 'actividad' ? (
           <Actividad />
         ) : currentView === 'memorandum' || currentView === 'memo' ? (
@@ -298,109 +377,70 @@ const Dashboard = ({ user, setUser, handleLogout }) => {
           <Tarifas />
         ) : currentView === 'cuenta_personal' ? (
           <CuentaPersonal handleLogout={handleLogout} />
-        ) : currentView === 'vehiculos-captura' ? (
-          <CapturaVehiculos handleLogout={handleLogout} />
+        ) : currentView === 'vehiculos' ? (
+          <Vehiculos />
+        ) : currentView === 'tramite' ? (
+          <Tramites user={user} />
         ) : (
-          <Box sx={{ p: 4 }}>
-            <Typography variant="h4" sx={{ mb: 4, textAlign: 'center', color: '#009887' }}>Bienvenido al Sistema de Viáticos</Typography>
-            <Box sx={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
-              gap: 3,
-              maxWidth: '800px',
-              margin: '0 auto'
-            }}>
-              {Object.entries(menuStructure).map(([menuKey, menu]) => (
-                <Box
-                  key={menuKey}
-                  sx={{
-                    perspective: '1000px',
-                    height: '200px'
-                  }}
-                >
-                  <Box
-                    sx={{
-                      position: 'relative',
-                      width: '100%',
-                      height: '100%',
-                      transformStyle: 'preserve-3d',
-                      transition: 'transform 0.8s ease-in-out',
-                      cursor: 'pointer',
-                      '&:hover': {
-                        transform: 'rotateY(180deg)'
-                      }
-                    }}
-                  >
-                    {/* Frente de la tarjeta */}
-                    <Box
-                      sx={{
-                        position: 'absolute',
-                        width: '100%',
-                        height: '100%',
-                        backfaceVisibility: 'hidden',
-                        backgroundColor: '#1e3f35',
-                        borderRadius: 2,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: 3
-                      }}
-                    >
-                      <Box sx={{ color: 'white', fontSize: '3rem', mb: 2 }}>
-                        {menuIcons[menuKey]}
-                      </Box>
-                      <Typography variant="h5" sx={{ color: 'white', fontWeight: 'bold', textAlign: 'center' }}>
-                        {menu.title}
-                      </Typography>
-                    </Box>
+          <Box sx={{ p: 4, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Typography variant="h3" sx={{ mb: 1, textAlign: 'center', color: '#f8fafc', fontWeight: 900, letterSpacing: '-0.025em' }}>
+              Bienvenido, <span style={{ color: '#38bdf8' }}>{user.nombres} {user.apellidos}</span>
+            </Typography>
+            <Typography variant="h6" sx={{ color: '#94a3b8', mb: 4, fontWeight: 500, textAlign: 'center' }}>
+              Ejercicio cargado: <span style={{ color: '#f8fafc', fontWeight: 700 }}>2026</span>. Puede empezar la captura.
+            </Typography>
 
-                    {/* Reverso de la tarjeta */}
-                    <Box
-                      sx={{
-                        position: 'absolute',
-                        width: '100%',
-                        height: '100%',
-                        backfaceVisibility: 'hidden',
-                        backgroundColor: '#2a5a47',
-                        borderRadius: 2,
-                        transform: 'rotateY(180deg)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: 3,
-                        p: 2
-                      }}
-                    >
-                      <Box sx={{ width: '100%' }}>
-                        {Object.entries(menu.items).map(([itemKey, item]) => (
-                          <Typography
-                            key={itemKey}
-                            variant="body1"
-                            sx={{
-                              color: 'white',
-                              mb: 1.5,
-                              textAlign: 'center',
-                              cursor: 'pointer',
-                              fontWeight: 500,
-                              fontSize: '1.1rem',
-                              letterSpacing: '0.5px',
-                              fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-                              '&:hover': {
-                                color: 'black'
-                              }
-                            }}
-                            onClick={() => handleItemClick(itemKey)}
-                          >
-                            {item.title}
-                          </Typography>
-                        ))}
-                      </Box>
-                    </Box>
-                  </Box>
+            <Box sx={{
+              display: 'flex',
+              gap: 4,
+              mb: 6,
+              p: 2,
+              borderRadius: '20px',
+              bgcolor: 'rgba(30, 41, 59, 0.5)',
+              border: '1px solid #334155',
+              backdropFilter: 'blur(8px)'
+            }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <Avatar sx={{ bgcolor: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8' }}>
+                  <AccessTime />
+                </Avatar>
+                <Box>
+                  <Typography variant="caption" sx={{ color: '#64748b', display: 'block', fontWeight: 700, textTransform: 'uppercase' }}>
+                    Hora Local
+                  </Typography>
+                  <Typography variant="h6" sx={{ color: '#f8fafc', fontWeight: 800, lineHeight: 1 }}>
+                    {dateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                  </Typography>
                 </Box>
-              ))}
+              </Box>
+
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <Avatar sx={{ bgcolor: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8' }}>
+                  <AttachMoney />
+                </Avatar>
+                <Box>
+                  <Typography variant="caption" sx={{ color: '#64748b', display: 'block', fontWeight: 700, textTransform: 'uppercase' }}>
+                    Dólar (USD/MXN)
+                  </Typography>
+                  <Typography variant="h6" sx={{ color: '#f8fafc', fontWeight: 800, lineHeight: 1 }}>
+                    {exchangeRate ? `$${exchangeRate}` : 'Cargando...'}
+                  </Typography>
+                </Box>
+              </Box>
+
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <Avatar sx={{ bgcolor: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8' }}>
+                  <CalendarMonth />
+                </Avatar>
+                <Box>
+                  <Typography variant="caption" sx={{ color: '#64748b', display: 'block', fontWeight: 700, textTransform: 'uppercase' }}>
+                    Fecha
+                  </Typography>
+                  <Typography variant="h6" sx={{ color: '#f8fafc', fontWeight: 800, lineHeight: 1 }}>
+                    {dateTime.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' }).toUpperCase()}
+                  </Typography>
+                </Box>
+              </Box>
             </Box>
           </Box>
         )}

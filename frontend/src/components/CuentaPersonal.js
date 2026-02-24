@@ -1,14 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, TextField, CircularProgress, Modal, Button, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
-
+import axios from 'axios';
 import { API_BASE_URL } from '../config';
+import {
+  Box, Typography, TextField, CircularProgress, Button, Select, MenuItem,
+  InputLabel, FormControl, Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper, Chip, IconButton, InputAdornment,
+  Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert
+} from '@mui/material';
+import {
+  Search as SearchIcon,
+  AccountBalance as AccountBalanceIcon,
+  Edit as EditIcon,
+  Warning as WarningIcon,
+  Badge as BadgeIcon
+} from '@mui/icons-material';
 
 const CuentaPersonal = ({ handleLogout }) => {
   const [busqueda, setBusqueda] = useState('');
   const [empleados, setEmpleados] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [mensaje, setMensaje] = useState('');
-
+  const [actionLoading, setActionLoading] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   // Modal State
   const [openModal, setOpenModal] = useState(false);
@@ -23,17 +35,18 @@ const CuentaPersonal = ({ handleLogout }) => {
 
   // Búsqueda automática cuando cambia el texto
   useEffect(() => {
-    if (busqueda.trim().length >= 2) {
-      buscarEmpleados();
-    } else if (busqueda.trim().length === 0) {
-      cargarEmpleadosIniciales();
-    } else {
-      setEmpleados([]);
-      setMensaje('');
-    }
+    const timer = setTimeout(() => {
+      if (busqueda.trim().length >= 2) {
+        buscarEmpleados();
+      } else if (busqueda.trim().length === 0) {
+        cargarEmpleadosIniciales();
+      } else {
+        setEmpleados([]);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [busqueda]);
-
 
   // Cargar primeros 8 empleados al iniciar y catalogo de bancos
   useEffect(() => {
@@ -42,23 +55,13 @@ const CuentaPersonal = ({ handleLogout }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-
   const cargarBancos = async () => {
     try {
       const token = localStorage.getItem('token');
-      console.log('Cargando bancos...');
-      const response = await fetch(`${API_BASE_URL}/api/catalogos/bancos`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      const response = await axios.get(`${API_BASE_URL}/api/catalogos/bancos`, {
+        headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Bancos cargados:', data.bancos);
-        setBancos(data.bancos || []);
-      } else {
-        console.error('Error al cargar bancos:', response.status);
-      }
+      setBancos(response.data.bancos || []);
     } catch (error) {
       console.error('Error cargando bancos:', error);
     }
@@ -68,82 +71,56 @@ const CuentaPersonal = ({ handleLogout }) => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/api/empleados/buscar`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      const response = await axios.get(`${API_BASE_URL}/api/empleados/buscar`, {
+        headers: { 'Authorization': `Bearer ${token}` }
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        setEmpleados(data.slice(0, 8));
-      } else if (response.status === 401) {
-        alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+      setEmpleados(response.data.slice(0, 8));
+    } catch (error) {
+      if (error.response?.status === 401) {
+        setSnackbar({ open: true, message: 'Sesión expirada', severity: 'error' });
         if (handleLogout) handleLogout();
       }
-    } catch (error) {
-      console.error('Error:', error);
     } finally {
       setLoading(false);
     }
   };
 
   const buscarEmpleados = async () => {
-    if (!busqueda.trim() || busqueda.trim().length < 2) return;
-
     setLoading(true);
-    setMensaje('');
-
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/api/empleados/buscar?q=${encodeURIComponent(busqueda)}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      const response = await axios.get(`${API_BASE_URL}/api/empleados/buscar?q=${encodeURIComponent(busqueda)}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        setEmpleados(data);
-        if (data.length === 0) {
-          setMensaje('No se encontraron empleados');
-        }
-      } else if (response.status === 401) {
-        alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+      setEmpleados(response.data);
+    } catch (error) {
+      if (error.response?.status === 401) {
         if (handleLogout) handleLogout();
       } else {
-        setMensaje('Error al buscar empleados');
+        setSnackbar({ open: true, message: 'Error al buscar empleados', severity: 'error' });
       }
-    } catch (error) {
-      console.error('Error:', error);
-      setMensaje('Error de conexión');
     } finally {
       setLoading(false);
     }
   };
 
-
   const handlOpenModal = async (empleado) => {
     setSelectedEmpleado(empleado);
     setOpenModal(true);
-    setAccountForm({ id_banco: '', cuenta: '', clabe: '' }); // Reset form
+    setAccountForm({ id_banco: '', cuenta: '', clabe: '' });
     setLoadingAccount(true);
 
-    // Fetch existing account if any
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/api/empleados/cuenta-bancaria/${empleado.id_empleado}`, {
+      const response = await axios.get(`${API_BASE_URL}/api/empleados/cuenta-bancaria/${empleado.id_empleado}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (response.ok) {
-        const data = await response.json();
-        if (data.cuenta) {
-          setAccountForm({
-            id_banco: data.cuenta.id_banco,
-            cuenta: data.cuenta.cuenta,
-            clabe: data.cuenta.clabe
-          });
-        }
+      if (response.data.cuenta) {
+        setAccountForm({
+          id_banco: response.data.cuenta.id_banco,
+          cuenta: response.data.cuenta.cuenta,
+          clabe: response.data.cuenta.clabe
+        });
       }
     } catch (error) {
       console.error("Error fetching account:", error);
@@ -159,244 +136,354 @@ const CuentaPersonal = ({ handleLogout }) => {
 
   const handleSaveAccount = async () => {
     if (!accountForm.id_banco || !accountForm.cuenta || !accountForm.clabe) {
-      alert('Por favor complete todos los campos bancarios');
+      setSnackbar({ open: true, message: 'Completa todos los campos', severity: 'warning' });
       return;
     }
 
-    if (accountForm.cuenta.length !== 10) {
-      alert('El número de cuenta debe tener exactamente 10 dígitos.');
+    if (accountForm.cuenta.length !== 10 || accountForm.clabe.length !== 18) {
+      setSnackbar({ open: true, message: 'Revisa la longitud de cuenta (10) y CLABE (18)', severity: 'warning' });
       return;
     }
 
-    if (accountForm.clabe.length !== 18) {
-      alert('La CLABE debe tener exactamente 18 dígitos.');
-      return;
-    }
-
+    setActionLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/api/empleados/cuenta-bancaria`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          id_empleado: selectedEmpleado.id_empleado,
-          ...accountForm
-        })
+      await axios.post(`${API_BASE_URL}/api/empleados/cuenta-bancaria`, {
+        id_empleado: selectedEmpleado.id_empleado,
+        ...accountForm
+      }, {
+        headers: { 'Authorization': `Bearer ${token}` }
       });
 
-      if (response.ok) {
-        alert('Cuenta bancaria guardada exitosamente');
-        handleCloseModal();
-        // Refresh the list
-        if (busqueda && busqueda.trim().length >= 2) {
-          buscarEmpleados();
-        } else {
-          cargarEmpleadosIniciales();
-        }
-      } else {
-        alert('Error al guardar la cuenta');
-      }
+      setSnackbar({ open: true, message: 'Cuenta bancaria guardada con éxito', severity: 'success' });
+      handleCloseModal();
+      busqueda ? buscarEmpleados() : cargarEmpleadosIniciales();
     } catch (error) {
-      console.error('Error saving account:', error);
-      alert('Error de conexión');
+      setSnackbar({ open: true, message: 'Error al guardar la cuenta', severity: 'error' });
+    } finally {
+      setActionLoading(false);
     }
   };
 
-  const modalStyle = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    boxShadow: 24,
-    p: 4,
-    borderRadius: 2
+  const inputStyles = {
+    '& .MuiOutlinedInput-root': {
+      bgcolor: '#0f172a',
+      outline: 'none !important',
+      '& fieldset': { borderColor: '#334155', borderWidth: 2 },
+      '&:hover fieldset': { borderColor: '#38bdf8' },
+      '&.Mui-focused': {
+        bgcolor: '#0f172a',
+        outline: 'none !important',
+        '& fieldset': { borderColor: '#38bdf8', borderWidth: 2 }
+      }
+    },
+    '& .MuiInputBase-input': {
+      color: '#f8fafc',
+      fontWeight: 600,
+      '&:focus': {
+        outline: 'none !important',
+        boxShadow: 'none !important',
+        bgcolor: 'transparent !important'
+      },
+      '&:-webkit-autofill': {
+        WebkitBoxShadow: '0 0 0 100px #0f172a inset',
+        WebkitTextFillColor: '#f8fafc',
+      }
+    },
+    '& .MuiInputLabel-root': { color: '#64748b', fontWeight: 600 },
+    '& .MuiInputLabel-root.Mui-focused': { color: '#38bdf8' },
+    '& .MuiSelect-icon': { color: '#64748b' }
   };
 
   return (
-    <div className="actividades-table-container cuentas-table-container" style={{ padding: '24px', maxWidth: '1000px', margin: '32px auto' }}>
-      <div className="table-header">
-        <h3>CUENTAS BANCARIAS DEL PERSONAL</h3>
-        <div className="search-box">
-          <input
-            type="text"
-            placeholder="Buscar empleado (nombre, RFC)..."
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
-          />
-          <span className="search-icon">🔍</span>
-          {loading && <CircularProgress size={20} sx={{ ml: 1 }} />}
-        </div>
-        {mensaje && <Typography color="error" variant="caption" sx={{ mt: 1, display: 'block' }}>{mensaje}</Typography>}
-      </div>
+    <Box sx={{
+      maxWidth: '100%',
+      margin: '0 auto',
+      p: 3,
+      fontFamily: "'Inter', sans-serif",
+      bgcolor: '#0f172a',
+      minHeight: '100vh',
+      color: '#f8fafc'
+    }}>
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        mb: 4,
+        flexWrap: 'wrap',
+        gap: 2
+      }}>
+        <Box>
+          <Typography variant="h4" sx={{ fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.025em', mb: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+            <AccountBalanceIcon sx={{ fontSize: 35, color: '#38bdf8' }} />
+            Cuentas Bancarias
+          </Typography>
+          <Typography variant="body2" sx={{ color: '#94a3b8', fontWeight: 500 }}>
+            Cuentas del Personal • <span style={{ color: '#38bdf8' }}>Administración</span>
+          </Typography>
+        </Box>
 
+        <TextField
+          placeholder="Buscar empleado..."
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+          variant="outlined"
+          size="small"
+          InputProps={{
+            startAdornment: <InputAdornment position="start"><SearchIcon sx={{ color: '#64748b' }} /></InputAdornment>,
+            endAdornment: loading && <CircularProgress size={20} sx={{ color: '#38bdf8' }} />,
+            sx: {
+              borderRadius: '12px',
+              bgcolor: '#1e293b',
+              color: '#f8fafc',
+              fontWeight: 600,
+              '& fieldset': { borderColor: '#334155' },
+              '&:hover fieldset': { borderColor: '#38bdf8' },
+              '&.Mui-focused fieldset': { borderColor: '#38bdf8' },
+              '& input': {
+                '&:-webkit-autofill': {
+                  WebkitBoxShadow: '0 0 0 100px #1e293b inset',
+                  WebkitTextFillColor: '#f8fafc',
+                },
+                '&:focus': {
+                  bgcolor: 'transparent',
+                }
+              },
+              '&.Mui-focused': {
+                bgcolor: '#1e293b !important', // Asegurar que no cambie a blanco
+              }
+            }
+          }}
+          sx={{ minWidth: 320 }}
+        />
+      </Box>
 
-      <div className="table-responsive">
-        <table style={{ tableLayout: 'fixed', width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ backgroundColor: '#f5f5f5', borderBottom: '1px solid #ddd' }}>
-              <th style={{ width: '20%', textAlign: 'center', padding: '12px', fontWeight: 'bold', color: '#555' }}>RFC</th>
-              <th style={{ width: '35%', textAlign: 'center', padding: '12px', fontWeight: 'bold', color: '#555' }}>Nombre</th>
-              <th style={{ width: '30%', textAlign: 'center', padding: '12px', fontWeight: 'bold', color: '#555' }}>Área</th>
-              <th style={{ width: '15%', textAlign: 'center', padding: '12px', fontWeight: 'bold', color: '#555' }}>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
+      <TableContainer sx={{ pb: 0 }}>
+        <Table sx={{ borderCollapse: 'separate', borderSpacing: '0 8px' }}>
+          <TableHead>
+            <TableRow>
+              <TableCell align="center" sx={{ borderBottom: 'none', color: '#64748b', fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>RFC</TableCell>
+              <TableCell align="center" sx={{ borderBottom: 'none', color: '#64748b', fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nombre Completo</TableCell>
+              <TableCell align="center" sx={{ borderBottom: 'none', color: '#64748b', fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Cuenta / CLABE</TableCell>
+              <TableCell align="center" sx={{ borderBottom: 'none', color: '#64748b', fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Acciones</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
             {empleados.length === 0 ? (
-              <tr>
-                <td colSpan="4" className="no-data" style={{ padding: '20px', textAlign: 'center', color: '#777' }}>
-                  {busqueda ? 'No se encontraron empleados' : 'Escribe para buscar empleados'}
-                </td>
-              </tr>
+              <TableRow>
+                <TableCell colSpan={4} align="center" sx={{ borderBottom: 'none', color: '#64748b', py: 6 }}>
+                  {busqueda ? 'No se encontraron resultados' : 'Buscando empleados...'}
+                </TableCell>
+              </TableRow>
             ) : (
-              empleados.map(empleado => (
-                <tr key={empleado.id_empleado} style={{ borderBottom: '1px solid #eee' }}>
-                  <td style={{ textAlign: 'center', padding: '12px', verticalAlign: 'top' }}>
-                    <div>{empleado.rfc || 'N/A'}</div>
+              empleados.map((empleado) => (
+                <TableRow
+                  key={empleado.id_empleado}
+                  sx={{
+                    backgroundColor: '#1e293b',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.5)',
+                    borderRadius: '16px',
+                    transition: 'all 0.2s',
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      backgroundColor: '#334155',
+                      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5)'
+                    },
+                    '& td': { borderBottom: 'none' },
+                    '& td:first-of-type': { borderTopLeftRadius: '16px', borderBottomLeftRadius: '16px' },
+                    '& td:last-of-type': { borderTopRightRadius: '16px', borderBottomRightRadius: '16px' }
+                  }}
+                >
+                  <TableCell align="center">
+                    <Typography sx={{ fontWeight: 700, color: '#f8fafc', fontSize: '0.85rem' }}>
+                      {empleado.rfc || '---'}
+                    </Typography>
                     {empleado.nombre_banco && (
-                      <div style={{ fontSize: '0.85rem', color: '#009688', marginTop: '4px' }}>
+                      <Typography sx={{ fontSize: '0.7rem', color: '#38bdf8', mt: 0.5, fontWeight: 600 }}>
                         {empleado.nombre_banco}
-                      </div>
+                      </Typography>
                     )}
-                  </td>
-                  <td style={{ textAlign: 'center', padding: '12px', verticalAlign: 'top' }}>
-                    <div>{empleado.nombre_completo}</div>
-                    {empleado.cuenta && (
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginTop: '4px' }}>
-                        <span style={{
-                          backgroundColor: '#e0f2f1',
-                          color: '#00695c',
-                          padding: '2px 8px',
-                          borderRadius: '12px',
-                          fontSize: '0.75rem',
-                          fontWeight: 'bold',
-                          border: '1px solid #b2dfdb'
-                        }}>
-                          CTA
-                        </span>
-                        <span style={{ fontSize: '0.9rem', color: '#555' }}>
-                          {empleado.cuenta}
-                        </span>
-                      </div>
-                    )}
-                  </td>
-                  <td style={{ textAlign: 'center', padding: '12px', verticalAlign: 'top' }}>
-                    <div>{empleado.area || 'N/A'}</div>
-                    {empleado.clabe && (
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginTop: '4px' }}>
-                        <span style={{
-                          backgroundColor: '#e0f2f1',
-                          color: '#00695c',
-                          padding: '2px 8px',
-                          borderRadius: '12px',
-                          fontSize: '0.75rem',
-                          fontWeight: 'bold',
-                          border: '1px solid #b2dfdb'
-                        }}>
-                          CLABE
-                        </span>
-                        <span style={{ fontSize: '0.9rem', color: '#555' }}>
-                          {empleado.clabe}
-                        </span>
-                      </div>
-                    )}
-                  </td>
-                  <td style={{ textAlign: 'center', padding: '12px', verticalAlign: 'top' }}>
-                    <div className="action-buttons" style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
-                      <button
-                        className="btn-icon edit"
-                        onClick={() => handlOpenModal(empleado)}
-                        title={empleado.cuenta ? "Editar Cuenta" : "Agregar Cuenta"}
-                        style={{ cursor: 'pointer', fontSize: '1.2rem' }}
-                      >
-                        ✎
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography sx={{ fontWeight: 600, color: '#cbd5e1', fontSize: '0.9rem' }}>
+                      {empleado.nombre_completo}
+                    </Typography>
+                    <Typography sx={{ fontSize: '0.75rem', color: '#64748b' }}>
+                      {empleado.area || 'Sin área asignada'}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, alignItems: 'center' }}>
+                      {empleado.cuenta ? (
+                        <Chip
+                          label={`CTA: ${empleado.cuenta}`}
+                          size="small"
+                          sx={{ bgcolor: 'rgba(45, 212, 191, 0.1)', color: '#2dd4bf', fontWeight: 700, fontSize: '0.75rem', border: '1px solid rgba(45, 212, 191, 0.2)' }}
+                        />
+                      ) : (
+                        <Typography sx={{ color: '#475569', fontSize: '0.75rem', fontStyle: 'italic' }}>Sin cuenta</Typography>
+                      )}
+                      {empleado.clabe && (
+                        <Chip
+                          label={`CLABE: ${empleado.clabe}`}
+                          size="small"
+                          sx={{ bgcolor: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', fontWeight: 700, fontSize: '0.75rem', border: '1px solid rgba(56, 189, 248, 0.2)' }}
+                        />
+                      )}
+                    </Box>
+                  </TableCell>
+                  <TableCell align="center">
+                    <IconButton
+                      onClick={() => handlOpenModal(empleado)}
+                      disableRipple
+                      size="small"
+                      sx={{
+                        color: '#64748b',
+                        bgcolor: 'transparent',
+                        p: 0.5,
+                        minWidth: 'auto',
+                        width: 'auto',
+                        height: 'auto',
+                        borderRadius: '6px',
+                        transition: 'all 0.2s',
+                        '&:hover': {
+                          color: '#38bdf8',
+                          backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                          transform: 'scale(1.1)'
+                        }
+                      }}
+                    >
+                      <EditIcon sx={{ fontSize: 20 }} />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
               ))
             )}
-          </tbody>
-        </table>
-      </div>
+          </TableBody>
+        </Table>
+      </TableContainer>
 
-
-      {/* Modal de Cuenta Bancaria */}
-      <Modal
+      {/* Dialogo de Edición */}
+      <Dialog
         open={openModal}
         onClose={handleCloseModal}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: '20px',
+            bgcolor: '#1e293b',
+            color: '#f8fafc',
+            border: '1px solid #334155',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+          }
+        }}
       >
-        <Box sx={modalStyle}>
-          <Typography id="modal-modal-title" variant="h6" component="h2" mb={2}>
-            Cuenta Bancaria
-          </Typography>
+        <DialogTitle sx={{ textAlign: 'center', fontWeight: 800, pt: 3 }}>
+          Configurar Cuenta
+        </DialogTitle>
+        <DialogContent sx={{ px: 3, py: 2 }}>
           {selectedEmpleado && (
-            <Typography variant="body2" mb={3} color="text.secondary">
-              Empleado: {selectedEmpleado.nombre_completo}
-            </Typography>
+            <Box sx={{ mb: 3, textAlign: 'center' }}>
+              <Chip
+                icon={<BadgeIcon sx={{ color: '#38bdf8 !important' }} />}
+                label={selectedEmpleado.nombre_completo}
+                sx={{ bgcolor: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', fontWeight: 700, py: 2, border: '1px solid rgba(56, 189, 248, 0.2)' }}
+              />
+            </Box>
           )}
 
           {loadingAccount ? (
-            <CircularProgress />
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+              <CircularProgress sx={{ color: '#38bdf8' }} />
+            </Box>
           ) : (
-            <>
-              <FormControl fullWidth margin="normal">
-                <InputLabel>Banco</InputLabel>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+              <FormControl fullWidth sx={inputStyles}>
+                <InputLabel>Banco Autorizado</InputLabel>
                 <Select
                   value={accountForm.id_banco}
-                  label="Banco"
+                  label="Banco Autorizado"
                   onChange={(e) => setAccountForm({ ...accountForm, id_banco: e.target.value })}
+                  sx={{ borderRadius: '12px' }}
                 >
                   {bancos.map((b) => (
-                    <MenuItem key={b.id_banco} value={b.id_banco}>
-                      {b.nombre_banco}
-                    </MenuItem>
+                    <MenuItem key={b.id_banco} value={b.id_banco}>{b.nombre_banco}</MenuItem>
                   ))}
                 </Select>
               </FormControl>
+
               <TextField
                 fullWidth
-                margin="normal"
-                label="No. Cuenta"
+                label="Número de Cuenta (10 dígitos)"
                 value={accountForm.cuenta}
                 onChange={(e) => {
-                  const val = e.target.value.replace(/\D/g, '');
-                  if (val.length <= 10) setAccountForm({ ...accountForm, cuenta: val });
+                  const val = e.target.value.replace(/\D/g, '').slice(0, 10);
+                  setAccountForm({ ...accountForm, cuenta: val });
                 }}
-                inputProps={{ maxLength: 10 }}
-                helperText={`${accountForm.cuenta.length}/10 dígitos`}
+                sx={inputStyles}
+                InputProps={{ sx: { borderRadius: '12px' } }}
               />
+
               <TextField
                 fullWidth
-                margin="normal"
-                label="CLABE Interbancaria"
+                label="CLABE Interbancaria (18 dígitos)"
                 value={accountForm.clabe}
                 onChange={(e) => {
-                  const val = e.target.value.replace(/\D/g, '');
-                  if (val.length <= 18) setAccountForm({ ...accountForm, clabe: val });
+                  const val = e.target.value.replace(/\D/g, '').slice(0, 18);
+                  setAccountForm({ ...accountForm, clabe: val });
                 }}
-                inputProps={{ maxLength: 18 }}
-                helperText={`${accountForm.clabe.length}/18 dígitos`}
+                sx={inputStyles}
+                InputProps={{ sx: { borderRadius: '12px' } }}
               />
-              <Box mt={3} display="flex" justifyContent="flex-end" gap={2}>
-                <Button onClick={handleCloseModal} color="secondary">
-                  Cancelar
-                </Button>
-                <Button onClick={handleSaveAccount} variant="contained" color="primary">
-                  Guardar
-                </Button>
-              </Box>
-            </>
+            </Box>
           )}
-        </Box>
-      </Modal>
-    </div >
+        </DialogContent>
+        <DialogActions sx={{ p: 3, justifyContent: 'center', gap: 2 }}>
+          <Button onClick={handleCloseModal} sx={{ color: '#94a3b8', fontWeight: 700, textTransform: 'none' }}>
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleSaveAccount}
+            variant="contained"
+            disabled={actionLoading}
+            startIcon={actionLoading && <CircularProgress size={18} color="inherit" />}
+            sx={{
+              bgcolor: '#38bdf8',
+              color: '#0f172a',
+              borderRadius: '10px',
+              fontWeight: 800,
+              textTransform: 'none',
+              px: 4,
+              '&:hover': { bgcolor: '#7dd3fc' },
+              '&:disabled': { bgcolor: '#334155' }
+            }}
+          >
+            {actionLoading ? 'Guardando...' : 'Guardar'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          severity={snackbar.severity}
+          sx={{
+            bgcolor: snackbar.severity === 'success' ? '#1e293b' : '#450a0a',
+            color: snackbar.severity === 'success' ? '#22c55e' : '#ef4444',
+            border: `1px solid ${snackbar.severity === 'success' ? '#22c55e' : '#ef4444'}`,
+            borderRadius: '12px',
+            fontWeight: 600
+          }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </Box>
   );
 };
 

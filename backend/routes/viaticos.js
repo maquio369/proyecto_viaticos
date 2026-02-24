@@ -88,8 +88,30 @@ router.post('/', auth, async (req, res) => {
             id_municipio, id_estado, id_pais,
             fecha_inicio, fecha_fin, dias, pernocta,
             monto_calculado, pasaje, combustible, otros,
-            tipo_pago, id_firma
+            tipo_pago, id_firma_autoriza, id_firma_fija
         } = req.body;
+
+        // Verificar si ya existe un folio_comision para este memorandum
+        let folio_comision = null;
+        const folioCheck = await pool.query(
+            'SELECT folio_comision FROM detalles_viaticos WHERE id_memorandum_comision = $1 AND folio_comision IS NOT NULL LIMIT 1',
+            [id_memorandum_comision]
+        );
+
+        if (folioCheck.rows.length > 0) {
+            folio_comision = folioCheck.rows[0].folio_comision;
+        } else {
+            // Generar nuevo folio_comision basado en el folio del memorandum
+            const memoRes = await pool.query(
+                'SELECT folio FROM memorandum_comision WHERE id_memorandum_comision = $1',
+                [id_memorandum_comision]
+            );
+            if (memoRes.rows.length > 0) {
+                folio_comision = `COM-${memoRes.rows[0].folio}`;
+            } else {
+                folio_comision = `COM-${id_memorandum_comision}`;
+            }
+        }
 
         const query = `
             INSERT INTO detalles_viaticos (
@@ -97,8 +119,9 @@ router.post('/', auth, async (req, res) => {
                 id_municipio, id_estado, id_pais,
                 fecha_inicio, fecha_fin, dias, pernocta,
                 monto_calculado, pasaje, combustible, otros,
-                tipo_pago, id_firma
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+                tipo_pago, id_firma_autoriza, id_firma_fija,
+                folio_comision
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
             RETURNING *
         `;
 
@@ -107,7 +130,8 @@ router.post('/', auth, async (req, res) => {
             id_municipio || null, id_estado || null, id_pais || null,
             fecha_inicio, fecha_fin, dias, pernocta,
             monto_calculado, pasaje || 0, combustible || 0, otros || 0,
-            tipo_pago, id_firma
+            tipo_pago, id_firma_autoriza, id_firma_fija || 15,  // Default a TEODORO si no viene
+            folio_comision
         ];
 
         const result = await pool.query(query, values);
@@ -123,20 +147,39 @@ router.post('/', auth, async (req, res) => {
 router.get('/memorandum/:id', auth, async (req, res) => {
     try {
         const { id } = req.params;
+
+        // Obtener viáticos
         const query = `
             SELECT dv.*, 
                    m.descripcion as municipio_nombre,
                    e.nombre_estado,
-                   f.nombre_firma
+                   f1.nombre_firma as firma_autoriza_nombre,
+                   f1.cargo_firma as firma_autoriza_cargo,
+                   f2.nombre_firma as firma_fija_nombre,
+                   f2.cargo_firma as firma_fija_cargo
             FROM detalles_viaticos dv
             LEFT JOIN municipios m ON dv.id_municipio = m.id_municipio
             LEFT JOIN estados_federacion e ON dv.id_estado = e.id_estado
-            JOIN firmas f ON dv.id_firma = f.id_firma
+            JOIN firmas f1 ON dv.id_firma_autoriza = f1.id_firma
+            JOIN firmas f2 ON dv.id_firma_fija = f2.id_firma
             WHERE dv.id_memorandum_comision = $1
             ORDER BY dv.fecha_inicio ASC
         `;
         const result = await pool.query(query, [id]);
-        res.json({ success: true, detalles: result.rows });
+
+        // Obtener gastos globales
+        const gastosQuery = `
+            SELECT * FROM gastos_globales_memorandum 
+            WHERE id_memorandum_comision = $1 AND esta_borrado = false
+        `;
+        const gastosResult = await pool.query(gastosQuery, [id]);
+        const gastosGlobales = gastosResult.rows[0] || null;
+
+        res.json({
+            success: true,
+            detalles: result.rows,
+            gastosGlobales: gastosGlobales
+        });
     } catch (error) {
         console.error('Error obteniendo detalles:', error);
         res.status(500).json({ success: false, message: error.message });

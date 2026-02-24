@@ -106,4 +106,89 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
+// Obtener firma de un memorandum específico
+router.get('/:id/firma', auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(
+      `SELECT m.id_firma, f.nombre_firma, f.cargo_firma, a.fecha as fecha_actividad
+       FROM memorandum_comision m
+       JOIN firmas f ON m.id_firma = f.id_firma
+       JOIN actividades a ON m.id_actividad = a.id_actividad
+       WHERE m.id_memorandum_comision = $1`,
+      [id]
+    );
+
+    res.json({
+      success: true,
+      firma: result.rows[0] || null
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Eliminar (Borrado lógico) memorandum
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(
+      'UPDATE memorandum_comision SET esta_borrado = true WHERE id_memorandum_comision = $1 RETURNING *',
+      [id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ success: false, message: 'Memorandum no encontrado' });
+    }
+
+    res.json({ success: true, message: 'Memorandum eliminado correctamente' });
+  } catch (error) {
+    console.error('Error eliminando memorandum:', error);
+    res.status(500).json({ success: false, message: 'Error en el servidor', error: error.message });
+  }
+});
+
+// Actualizar memorandum
+router.put('/:id', auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { id_actividad, id_empleado, periodo_inicio, periodo_fin, tipo_transporte, id_firma, observaciones, id_vehiculo } = req.body;
+
+    const result = await pool.query(
+      `UPDATE memorandum_comision 
+       SET id_actividad = $1, 
+           id_empleado = $2, 
+           periodo_inicio = $3, 
+           periodo_fin = $4, 
+           tipo_transporte = $5, 
+           id_firma = $6, 
+           observaciones = $7,
+           id_vehiculo = $8
+       WHERE id_memorandum_comision = $9 AND esta_borrado = false
+       RETURNING *`,
+      [id_actividad, id_empleado, periodo_inicio, periodo_fin, tipo_transporte, id_firma, observaciones, id_vehiculo, id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ success: false, message: 'Memorandum no encontrado' });
+    }
+
+    res.json({
+      success: true,
+      message: 'Memorandum actualizado exitosamente',
+      memorandum: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Error actualizando memorandum:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al actualizar el memorandum',
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;

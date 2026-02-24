@@ -2,6 +2,13 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
 import {
+    Dialog, DialogTitle, DialogContent, DialogActions, Box, Typography,
+    TextField, Button, CircularProgress, Grid, Paper, Chip, IconButton,
+    Alert, Snackbar, MenuItem, Select, FormControl, InputLabel,
+    Switch, FormControlLabel, Table, TableBody, TableCell, TableContainer,
+    TableHead, TableRow, Tooltip, InputAdornment
+} from '@mui/material';
+import {
     AttachMoney as MoneyIcon,
     LocalGasStation as GasIcon,
     Flight as FlightIcon,
@@ -11,31 +18,67 @@ import {
     Hotel as HotelIcon,
     AccessTime as TimeIcon,
     Calculate as CalculateIcon,
-    Delete as DeleteIcon
+    Delete as DeleteIcon,
+    Add as AddIcon,
+    Warning as WarningIcon,
+    CheckCircle as CheckIcon,
+    Person as PersonIcon,
+    Close as CloseIcon
 } from '@mui/icons-material';
 
 const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) => {
-    const [loading, setLoading] = useState(false);
     const [municipios, setMunicipios] = useState([]);
     const [firmas, setFirmas] = useState([]);
+    const [firmasFijasDisponibles, setFirmasFijasDisponibles] = useState([]);  // Nuevo estado
     const [detalles, setDetalles] = useState([]);
+    const [fechaActividad, setFechaActividad] = useState(null);  // Fecha de la actividad del memorandum
+    const [gastosGlobales, setGastosGlobales] = useState(null);
+    const [deleteConfirm, setDeleteConfirm] = useState({ open: false, id: null }); // Estado para confirmación themed
 
     const [formData, setFormData] = useState({
+        id_municipio: '',
+        id_estado: null,
+        id_pais: null,
+        fecha_inicio: '',
+        fecha_fin: '',
+        dias: 0,
+        pernocta: false,
+        monto_diario: 0,
         pasaje: 0,
         combustible: 0,
         otros: 0,
         tipo: '',
-        id_firma: '',
-        id_municipio: '',
-        monto_diario: 0,
-        fecha_inicio: '',
-        fecha_fin: '',
-        dias: 0,
-        pernocta: false
+        id_firma_autoriza: '',
+        id_firma_fija: ''
     });
 
     const [totalCalculado, setTotalCalculado] = useState(0);
+    const [actionLoading, setActionLoading] = useState(false);
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
+    // Función para validar si la fecha de inicio es válida (debe ser DESPUÉS de la fecha de actividad)
+    const esFechaInicioValida = (fechaInicio) => {
+        if (!fechaActividad || !fechaInicio) return true;
+
+        const fechaAct = new Date(fechaActividad);
+        const fechaIni = new Date(fechaInicio);
+
+        // La fecha de inicio debe ser MAYOR (no igual) a la fecha de actividad
+        return fechaIni > fechaAct;
+    };
+
+    // Función para validar si la fecha de fin es válida
+    const esFechaFinValida = (fechaFin) => {
+        if (!fechaActividad || !fechaFin) return true;
+
+        const fechaAct = new Date(fechaActividad);
+        const fechaF = new Date(fechaFin);
+
+        // La fecha de fin también debe ser MAYOR (no igual) a la fecha de actividad
+        return fechaF > fechaAct;
+    };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         if (isOpen) {
             cargarCatalogos();
@@ -44,10 +87,15 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
     }, [isOpen, idMemorandum]);
 
     useEffect(() => {
-        const total = (parseFloat(formData.monto_diario) || 0) * (parseFloat(formData.dias) || 0);
+        // Si NO pernocta, el total es solo el monto diario (sin multiplicar por días)
+        // Si SÍ pernocta, el total es monto_diario * días
+        const total = formData.pernocta
+            ? (parseFloat(formData.monto_diario) || 0) * (parseFloat(formData.dias) || 0)
+            : (parseFloat(formData.monto_diario) || 0);
         setTotalCalculado(total);
-    }, [formData.monto_diario, formData.dias]);
+    }, [formData.monto_diario, formData.dias, formData.pernocta]);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         if (formData.id_municipio && idEmpleado) {
             calcularTarifa();
@@ -59,10 +107,41 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
             const resM = await axios.get(`${API_BASE_URL}/api/catalogos/municipios`);
             setMunicipios(resM.data.municipios);
 
-            const resF = await axios.get(`${API_BASE_URL}/api/catalogos/firma-por-empleado/${idEmpleado}`);
-            if (resF.data.firma) {
-                setFirmas([resF.data.firma]);
-                setFormData(prev => ({ ...prev, id_firma: resF.data.firma.id_firma }));
+            // Cargar firma del memorandum
+            const resMemoFirma = await axios.get(
+                `${API_BASE_URL}/api/memorandum/${idMemorandum}/firma`,
+                { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+            );
+
+            // Cargar firmas fijas dinámicas (puede haber múltiples)
+            const resFirmaFija = await axios.get(
+                `${API_BASE_URL}/api/catalogos/firma-fija`
+            );
+
+            if (resMemoFirma.data.firma && resFirmaFija.data.firmas && resFirmaFija.data.firmas.length > 0) {
+                const firmasFijas = resFirmaFija.data.firmas;
+                setFirmasFijasDisponibles(firmasFijas);
+
+                // Guardar fecha de actividad para validación
+                if (resMemoFirma.data.firma.fecha_actividad) {
+                    setFechaActividad(resMemoFirma.data.firma.fecha_actividad);
+                }
+
+                // Si solo hay una firma fija, auto-seleccionarla
+                const firmaFijaSeleccionada = firmasFijas.length === 1 ? firmasFijas[0] : null;
+
+                // Guardar ambas firmas para mostrar en UI
+                setFirmas([
+                    resMemoFirma.data.firma,  // Firma del memorandum
+                    firmaFijaSeleccionada     // Firma fija (puede ser null si hay múltiples)
+                ]);
+
+                // Guardar la firma del memorandum en formData
+                setFormData(prev => ({
+                    ...prev,
+                    id_firma_autoriza: resMemoFirma.data.firma.id_firma,
+                    id_firma_fija: firmaFijaSeleccionada ? firmaFijaSeleccionada.id_firma : ''
+                }));
             }
         } catch (error) {
             console.error('Error cargando catalogos modal:', error);
@@ -77,6 +156,18 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
             });
             if (res.data.success) {
                 setDetalles(res.data.detalles);
+                setGastosGlobales(res.data.gastosGlobales);
+
+                // Si hay gastos globales, pre-cargar en el formulario
+                if (res.data.gastosGlobales) {
+                    setFormData(prev => ({
+                        ...prev,
+                        pasaje: res.data.gastosGlobales.pasaje || 0,
+                        combustible: res.data.gastosGlobales.combustible || 0,
+                        otros: res.data.gastosGlobales.otros || 0,
+                        tipo: res.data.gastosGlobales.tipo_pago || ''
+                    }));
+                }
             }
         } catch (error) {
             console.error('Error cargando detalles:', error);
@@ -102,35 +193,171 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
         }
     };
 
+    const calcularDias = (inicio, fin) => {
+        if (!inicio || !fin) return 0;
+        const start = new Date(inicio);
+        const end = new Date(fin);
+
+        // Reset hours to compare only dates
+        start.setHours(0, 0, 0, 0);
+        end.setHours(0, 0, 0, 0);
+
+        if (end < start) return 0;
+
+        const diffTime = Math.abs(end - start);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Difference only
+        return diffDays;
+    };
+
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
+
+        setFormData(prev => {
+            const newData = {
+                ...prev,
+                [name]: type === 'checkbox' ? checked : value
+            };
+
+            // Cálculo automático de días si cambian las fechas
+            if (name === 'fecha_inicio' || name === 'fecha_fin') {
+                const totalDias = calcularDias(newData.fecha_inicio, newData.fecha_fin);
+                newData.dias = totalDias;
+            }
+
+            // Validaciones de Pernocta
+            if (name === 'pernocta' && checked) {
+                // Si intenta activar pernocta y las fechas son iguales
+                if (newData.fecha_inicio === newData.fecha_fin && newData.fecha_inicio !== '') {
+                    setSnackbar({
+                        open: true,
+                        message: 'La pernocta requiere que las fechas de inicio y fin sean diferentes',
+                        severity: 'warning'
+                    });
+                    newData.pernocta = false;
+                }
+            } else if (name === 'pernocta' && !checked) {
+                // Si intenta quitar pernocta y las fechas son diferentes
+                if (newData.fecha_inicio !== newData.fecha_fin && newData.fecha_inicio !== '' && newData.fecha_fin !== '') {
+                    setSnackbar({
+                        open: true,
+                        message: 'Sin pernocta, las fechas de inicio y fin deben ser iguales',
+                        severity: 'warning'
+                    });
+                    // Agrego una advertencia proactiva pero no bloqueo el toggle aquí para dejar que el usuario corrija las fechas
+                }
+            }
+
+            // Si se cambian las fechas, validar consistencia con el estado actual de pernocta
+            if (name === 'fecha_inicio' || name === 'fecha_fin') {
+                if (newData.fecha_inicio !== '' && newData.fecha_fin !== '') {
+                    if (newData.pernocta && newData.fecha_inicio === newData.fecha_fin) {
+                        setSnackbar({
+                            open: true,
+                            message: 'Pernocta detectada en el mismo día. Desactivando pernocta...',
+                            severity: 'info'
+                        });
+                        newData.pernocta = false;
+                    }
+                }
+            }
+
+            return newData;
+        });
+    };
+
+    // Función para validar que una fecha no se use más de 2 veces
+    const validarUsoFechas = (fechaInicio, fechaFin) => {
+        // Crear un mapa para contar cuántas veces se usa cada fecha
+        const conteoFechas = {};
+
+        // Contar fechas en viáticos existentes
+        detalles.forEach(detalle => {
+            const inicio = new Date(detalle.fecha_inicio);
+            const fin = new Date(detalle.fecha_fin);
+
+            // Iterar por cada día del rango
+            for (let d = new Date(inicio); d <= fin; d.setDate(d.getDate() + 1)) {
+                const fechaStr = d.toISOString().split('T')[0];
+                conteoFechas[fechaStr] = (conteoFechas[fechaStr] || 0) + 1;
+            }
+        });
+
+        // Verificar las fechas del nuevo viático
+        const nuevoInicio = new Date(fechaInicio);
+        const nuevoFin = new Date(fechaFin);
+        const fechasConflicto = [];
+
+        for (let d = new Date(nuevoInicio); d <= nuevoFin; d.setDate(d.getDate() + 1)) {
+            const fechaStr = d.toISOString().split('T')[0];
+            const usos = conteoFechas[fechaStr] || 0;
+
+            if (usos >= 2) {
+                fechasConflicto.push(new Date(fechaStr).toLocaleDateString('es-MX'));
+            }
+        }
+
+        return fechasConflicto;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!formData.id_firma || !formData.tipo) {
-            alert("Faltan datos obligatorios (Firma o Tipo de Pago)");
+        if (!formData.id_firma_autoriza || !formData.tipo) {
+            setSnackbar({ open: true, message: 'Faltan datos obligatorios (Firma o Tipo de Pago)', severity: 'warning' });
             return;
         }
 
+        // Validación final de pernocta
+        if (formData.pernocta) {
+            if (formData.fecha_inicio === formData.fecha_fin) {
+                setSnackbar({ open: true, message: 'La pernocta requiere que las fechas de inicio y fin sean diferentes', severity: 'error' });
+                return;
+            }
+        } else {
+            // No pernocta
+            if (formData.fecha_inicio !== formData.fecha_fin) {
+                setSnackbar({ open: true, message: 'Sin pernocta, las fechas de inicio y fin deben ser iguales', severity: 'error' });
+                return;
+            }
+        }
+
+        // Validar uso de fechas (máximo 2 veces por fecha)
+        const fechasConflicto = validarUsoFechas(formData.fecha_inicio, formData.fecha_fin);
+        if (fechasConflicto.length > 0) {
+            setSnackbar({
+                open: true,
+                message: `No se puede agregar: Las fechas ${fechasConflicto.slice(0, 2).join(', ')}${fechasConflicto.length > 2 ? '...' : ''} ya se usaron 2 veces`,
+                severity: 'error'
+            });
+            return;
+        }
+
+        setActionLoading(true);
         try {
             const token = localStorage.getItem('token');
             const payload = {
                 id_memorandum_comision: idMemorandum,
-                ...formData,
+                id_municipio: formData.id_municipio,
+                id_estado: formData.id_estado,
+                id_pais: formData.id_pais,
+                fecha_inicio: formData.fecha_inicio,
+                fecha_fin: formData.fecha_fin,
+                dias: formData.pernocta ? parseFloat(formData.dias) : 0.5,
+                pernocta: formData.pernocta,
                 monto_calculado: totalCalculado,
-                tipo_pago: formData.tipo
+                monto_diario: formData.monto_diario,
+                pasaje: 0,
+                combustible: 0,
+                otros: 0,
+                tipo_pago: formData.tipo,
+                id_firma_autoriza: formData.id_firma_autoriza,
+                id_firma_fija: formData.id_firma_fija
             };
 
             await axios.post(`${API_BASE_URL}/api/viaticos`, payload, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            alert('Viático agregado correctamente');
+            setSnackbar({ open: true, message: 'Viático agregado correctamente', severity: 'success' });
             cargarDetalles();
             setFormData(prev => ({
                 ...prev,
@@ -144,394 +371,744 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
 
         } catch (error) {
             console.error('Error guardando viatico:', error);
-            alert('Error al guardar');
+            setSnackbar({ open: true, message: 'Error al guardar el viático', severity: 'error' });
+        } finally {
+            setActionLoading(false);
         }
     };
 
-    const eliminarDetalle = async (id) => {
-        if (!window.confirm("¿Seguro de eliminar este registro?")) return;
+    const handleAgregarGastos = async () => {
+        if ((parseFloat(formData.pasaje) || 0) === 0 &&
+            (parseFloat(formData.combustible) || 0) === 0 &&
+            (parseFloat(formData.otros) || 0) === 0) {
+            setSnackbar({ open: true, message: 'Debe ingresar al menos un gasto', severity: 'warning' });
+            return;
+        }
+
+        if (!formData.tipo) {
+            setSnackbar({ open: true, message: 'Debe seleccionar el Tipo de Pago', severity: 'warning' });
+            return;
+        }
+
+        setActionLoading(true);
+        try {
+            const token = localStorage.getItem('token');
+
+            const payload = {
+                id_memorandum_comision: idMemorandum,
+                pasaje: parseFloat(formData.pasaje) || 0,
+                combustible: parseFloat(formData.combustible) || 0,
+                otros: parseFloat(formData.otros) || 0,
+                tipo_pago: formData.tipo,
+                id_firma_autoriza: formData.id_firma_autoriza,
+                id_firma_fija: formData.id_firma_fija
+            };
+
+            await axios.post(`${API_BASE_URL}/api/gastos-globales`, payload, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            setSnackbar({ open: true, message: 'Gastos globales actualizados', severity: 'success' });
+            cargarDetalles();
+
+            setFormData(prev => ({
+                ...prev,
+                pasaje: 0,
+                combustible: 0,
+                otros: 0
+            }));
+
+        } catch (error) {
+            console.error('Error guardando gastos globales:', error);
+            setSnackbar({ open: true, message: 'Error al guardar gastos globales', severity: 'error' });
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const eliminarDetalle = (id) => {
+        setDeleteConfirm({ open: true, id });
+    };
+
+    const handleConfirmDelete = async () => {
+        const id = deleteConfirm.id;
+        setActionLoading(true);
         try {
             const token = localStorage.getItem('token');
             await axios.delete(`${API_BASE_URL}/api/viaticos/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
+            setSnackbar({ open: true, message: 'Registro eliminado correctamente', severity: 'success' });
             cargarDetalles();
         } catch (error) {
             console.error(error);
+            setSnackbar({ open: true, message: 'Error al eliminar el registro', severity: 'error' });
+        } finally {
+            setActionLoading(false);
+            setDeleteConfirm({ open: false, id: null });
         }
     };
-
-    if (!isOpen) return null;
-
-    const inputStyle = {
-        width: '100%',
-        padding: '0.5rem',
-        border: '1px solid #e0e0e0',
-        borderRadius: '6px',
-        fontSize: '0.9rem',
-        transition: 'border-color 0.2s'
-    };
-
-    const labelStyle = {
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.3rem',
-        color: '#546e7a',
-        fontSize: '0.8rem',
-        fontWeight: '500',
-        marginBottom: '0.3rem'
+    const inputStyles = {
+        '& .MuiOutlinedInput-root': {
+            bgcolor: '#0f172a',
+            color: '#f8fafc',
+            borderRadius: '12px',
+            '& fieldset': { borderColor: '#334155' },
+            '&:hover fieldset': { borderColor: '#475569' },
+            '&.Mui-focused fieldset': { borderColor: '#38bdf8' },
+            '& input': {
+                bgcolor: 'transparent',
+                // Quitar flechitas (spin buttons)
+                '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button': {
+                    '-webkit-appearance': 'none',
+                    margin: 0,
+                },
+                '&[type=number]': {
+                    '-moz-appearance': 'textfield',
+                },
+                '&:-webkit-autofill': {
+                    WebkitBoxShadow: '0 0 0 100px #0f172a inset !important',
+                    WebkitTextFillColor: '#f8fafc !important',
+                    transition: 'background-color 5000s ease-in-out 0s',
+                },
+            },
+        },
+        '& .MuiInputLabel-root': { color: '#64748b' },
+        '& .MuiInputLabel-root.Mui-focused': { color: '#38bdf8' },
+        '& .MuiSelect-icon': { color: '#64748b' }
     };
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-content viaticos-modal" style={{ maxWidth: '850px', maxHeight: '90vh', overflow: 'auto' }}>
-                {/* Header Compacto */}
-                <div style={{
-                    background: 'linear-gradient(135deg, #009688 0%, #00796b 100%)',
-                    color: 'white',
-                    padding: '1rem 1.25rem',
-                    borderRadius: '8px 8px 0 0',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <CalculateIcon style={{ fontSize: '1.5rem' }} />
-                        <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '600' }}>Cálculo de Viáticos</h3>
-                    </div>
-                    <button onClick={onClose} style={{
-                        background: 'rgba(255,255,255,0.2)',
-                        color: 'white',
-                        border: 'none',
-                        fontSize: '1.5rem',
-                        width: '30px',
-                        height: '30px',
-                        borderRadius: '50%',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        padding: 0
-                    }}>&times;</button>
-                </div>
+        <Dialog
+            open={isOpen}
+            onClose={onClose}
+            maxWidth="md"
+            fullWidth
+            PaperProps={{
+                sx: {
+                    bgcolor: '#0f172a',
+                    color: '#f8fafc',
+                    borderRadius: '24px',
+                    backgroundImage: 'none',
+                    border: '1px solid #1e293b',
+                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+                }
+            }}
+        >
+            <DialogTitle sx={{
+                py: 2.2,
+                px: 3,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                borderBottom: '1px solid #1e293b'
+            }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+                    <CalculateIcon sx={{ color: '#38bdf8', fontSize: 24 }} />
+                    <Box>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, letterSpacing: '-0.01em', lineHeight: 1.2 }}>
+                            Cálculo de Viáticos
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, display: 'block', mt: -0.2 }}>
+                            Oficio de Comisión • Gestión de Gastos
+                        </Typography>
+                    </Box>
+                </Box>
+                <IconButton
+                    onClick={onClose}
+                    sx={{
+                        color: '#64748b',
+                        width: 28,
+                        height: 28,
+                        p: 0,
+                        '&:hover': { color: '#f8fafc', bgcolor: '#1e293b' }
+                    }}
+                >
+                    <CloseIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+            </DialogTitle>
 
-                <div style={{ padding: '1rem' }}>
-                    {/* Sección Gastos - Más Compacta */}
-                    <div style={{
-                        background: '#f8f9fa',
-                        padding: '0.75rem',
-                        borderRadius: '8px',
-                        marginBottom: '0.75rem',
-                        border: '1px solid #e0e0e0'
+            <DialogContent sx={{ px: 3, pb: 4, pt: 5 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    {/* SECCIÓN 1: GASTOS GLOBALES */}
+                    <Paper sx={{
+                        p: 3,
+                        bgcolor: '#1e293b',
+                        borderRadius: '16px',
+                        border: '1px solid #334155',
+                        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
                     }}>
-                        <h4 style={{
-                            color: '#00796b',
-                            margin: '0 0 0.6rem 0',
-                            fontSize: '0.95rem',
-                            fontWeight: '600',
+                        <Typography variant="subtitle1" sx={{
+                            color: '#38bdf8',
+                            fontWeight: 800,
+                            mb: 2.5,
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '0.4rem'
+                            gap: 1
                         }}>
-                            <MoneyIcon fontSize="small" /> Gastos y Configuración
-                        </h4>
+                            <MoneyIcon sx={{ fontSize: 20 }} /> Gastos Globales
+                        </Typography>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.6rem', marginBottom: '0.6rem' }}>
-                            <div>
-                                <label style={labelStyle}>
-                                    <FlightIcon sx={{ fontSize: '0.9rem' }} /> Pasajes
-                                </label>
-                                <input type="number" name="pasaje" value={formData.pasaje} onChange={handleInputChange} style={inputStyle} />
-                            </div>
-
-                            <div>
-                                <label style={labelStyle}>
-                                    <GasIcon sx={{ fontSize: '0.9rem' }} /> Combustible
-                                </label>
-                                <input type="number" name="combustible" value={formData.combustible} onChange={handleInputChange} style={inputStyle} />
-                            </div>
-
-                            <div>
-                                <label style={labelStyle}>
-                                    <MoreIcon sx={{ fontSize: '0.9rem' }} /> Otros
-                                </label>
-                                <input type="number" name="otros" value={formData.otros} onChange={handleInputChange} style={inputStyle} />
-                            </div>
-
-                            <div>
-                                <label style={labelStyle}>💳 Tipo Pago</label>
-                                <select name="tipo" value={formData.tipo} onChange={handleInputChange} required style={{ ...inputStyle, cursor: 'pointer' }}>
-                                    <option value="">Seleccionar</option>
-                                    <option value="Efectivo">💵 Efectivo</option>
-                                    <option value="Cheque">📝 Cheque</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label style={labelStyle}>✍️ Firma Autorizada</label>
-                            <select name="id_firma" value={formData.id_firma} onChange={handleInputChange} required style={{ ...inputStyle, cursor: 'pointer' }}>
-                                <option value="">Seleccionar</option>
-                                {firmas.map(f => (
-                                    <option key={f.id_firma} value={f.id_firma}>{f.nombre_firma} - {f.cargo_firma}</option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-
-                    {/* Calculadora - Compacta */}
-                    <form onSubmit={handleSubmit} style={{
-                        background: 'linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%)',
-                        padding: '0.75rem',
-                        borderRadius: '8px',
-                        marginBottom: '0.75rem',
-                        border: '2px solid #009688'
-                    }}>
-                        <h4 style={{
-                            color: '#00796b',
-                            margin: '0 0 0.6rem 0',
-                            fontSize: '0.95rem',
-                            fontWeight: '600',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.4rem'
-                        }}>
-                            <CalculateIcon fontSize="small" /> Calculadora de Viáticos
-                        </h4>
-
-                        <div style={{ marginBottom: '0.6rem' }}>
-                            <label style={{ ...labelStyle, color: '#00796b', fontWeight: '600' }}>
-                                <LocationIcon sx={{ fontSize: '0.9rem' }} /> Municipio Destino
-                            </label>
-                            <select name="id_municipio" value={formData.id_municipio} onChange={handleInputChange} required
-                                style={{ ...inputStyle, border: '2px solid #009688', background: 'white', cursor: 'pointer', fontWeight: '500' }}>
-                                <option value="">SELECCIONAR</option>
-                                {municipios.map(m => (
-                                    <option key={m.id_municipio} value={m.id_municipio}>{m.descripcion}</option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '0.6rem', marginBottom: '0.6rem' }}>
-                            <div>
-                                <label style={{ ...labelStyle, color: '#00796b', fontWeight: '600' }}>💰 Tarifa Diaria</label>
-                                <input type="text" value={`$${parseFloat(formData.monto_diario || 0).toFixed(2)}`} readOnly
-                                    style={{ ...inputStyle, border: '2px solid #009688', fontSize: '1rem', fontWeight: 'bold', background: 'white', color: '#00796b', textAlign: 'center' }}
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} sm={3}>
+                                <TextField
+                                    label="Pasajes"
+                                    name="pasaje"
+                                    type="number"
+                                    value={formData.pasaje}
+                                    onChange={handleInputChange}
+                                    fullWidth
+                                    size="small"
+                                    InputProps={{
+                                        startAdornment: <InputAdornment position="start"><FlightIcon sx={{ fontSize: 18, color: '#64748b' }} /></InputAdornment>,
+                                    }}
+                                    sx={inputStyles}
                                 />
-                            </div>
-
-                            <div>
-                                <label style={{ ...labelStyle, color: '#00796b', fontWeight: '600' }}>
-                                    <HotelIcon sx={{ fontSize: '0.9rem' }} /> Pernocta
-                                </label>
-                                <div style={{
-                                    background: 'white',
-                                    padding: '0.5rem',
-                                    borderRadius: '6px',
-                                    border: '2px solid #009688',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    height: '100%',
-                                    gap: '0.3rem'
-                                }}>
-                                    <div
-                                        onClick={() => handleInputChange({ target: { name: 'pernocta', type: 'checkbox', checked: !formData.pernocta } })}
-                                        style={{
-                                            width: '50px',
-                                            height: '24px',
-                                            background: formData.pernocta ? '#4caf50' : '#ccc',
-                                            borderRadius: '12px',
-                                            position: 'relative',
-                                            cursor: 'pointer',
-                                            transition: 'background 0.3s ease',
-                                            boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.2)'
-                                        }}
+                            </Grid>
+                            <Grid item xs={12} sm={3}>
+                                <TextField
+                                    label="Combustible"
+                                    name="combustible"
+                                    type="number"
+                                    value={formData.combustible}
+                                    onChange={handleInputChange}
+                                    fullWidth
+                                    size="small"
+                                    InputProps={{
+                                        startAdornment: <InputAdornment position="start"><GasIcon sx={{ fontSize: 18, color: '#64748b' }} /></InputAdornment>,
+                                    }}
+                                    sx={inputStyles}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={3}>
+                                <TextField
+                                    label="Otros"
+                                    name="otros"
+                                    type="number"
+                                    value={formData.otros}
+                                    onChange={handleInputChange}
+                                    fullWidth
+                                    size="small"
+                                    InputProps={{
+                                        startAdornment: <InputAdornment position="start"><MoreIcon sx={{ fontSize: 18, color: '#64748b' }} /></InputAdornment>,
+                                    }}
+                                    sx={inputStyles}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={3}>
+                                <FormControl fullWidth size="small" sx={inputStyles}>
+                                    <InputLabel id="tipo-pago-label">Tipo Pago</InputLabel>
+                                    <Select
+                                        labelId="tipo-pago-label"
+                                        label="Tipo Pago"
+                                        name="tipo"
+                                        value={formData.tipo}
+                                        onChange={handleInputChange}
                                     >
-                                        <div style={{
-                                            width: '20px',
-                                            height: '20px',
-                                            background: 'white',
-                                            borderRadius: '50%',
-                                            position: 'absolute',
-                                            top: '2px',
-                                            left: formData.pernocta ? '28px' : '2px',
-                                            transition: 'left 0.3s ease',
-                                            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                                        }} />
-                                    </div>
-                                    <span style={{ fontSize: '0.75rem', fontWeight: '600', color: formData.pernocta ? '#4caf50' : '#666' }}>
-                                        {formData.pernocta ? 'SI (mayor a 24 Hrs.)' : 'NO (entre 8 y 24 Hrs.)'}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
+                                        <MenuItem value=""><em>Seleccionar</em></MenuItem>
+                                        <MenuItem value="Efectivo">Efectivo 💵</MenuItem>
+                                        <MenuItem value="Cheque">Cheque 📝</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Button
+                                    fullWidth
+                                    variant="contained"
+                                    onClick={handleAgregarGastos}
+                                    disabled={actionLoading || !formData.tipo}
+                                    startIcon={actionLoading ? <CircularProgress size={20} /> : <AddIcon />}
+                                    sx={{
+                                        bgcolor: '#38bdf8',
+                                        color: '#0f172a',
+                                        fontWeight: 800,
+                                        borderRadius: '10px',
+                                        textTransform: 'none',
+                                        py: 1,
+                                        '&:hover': { bgcolor: '#7dd3fc' },
+                                        mt: 1
+                                    }}
+                                >
+                                    {gastosGlobales ? 'Actualizar Gastos Globales' : 'Agregar Gastos Globales'}
+                                </Button>
+                            </Grid>
+                        </Grid>
+                    </Paper>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem', marginBottom: '0.6rem' }}>
-                            <div>
-                                <label style={{ ...labelStyle, color: '#00796b', fontWeight: '600' }}>
-                                    <CalendarIcon sx={{ fontSize: '0.85rem' }} /> Inicio
-                                </label>
-                                <input type="date" name="fecha_inicio" value={formData.fecha_inicio} onChange={handleInputChange} required
-                                    style={{ ...inputStyle, border: '2px solid #009688', background: 'white' }}
-                                />
-                            </div>
-
-                            <div>
-                                <label style={{ ...labelStyle, color: '#00796b', fontWeight: '600' }}>
-                                    <CalendarIcon sx={{ fontSize: '0.85rem' }} /> Fin
-                                </label>
-                                <input type="date" name="fecha_fin" value={formData.fecha_fin} onChange={handleInputChange} required
-                                    style={{ ...inputStyle, border: '2px solid #009688', background: 'white' }}
-                                />
-                            </div>
-                        </div>
-
-                        {/* Fila Final Compacta */}
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: '100px 1fr auto',
-                            gap: '0.6rem',
-                            alignItems: 'end',
-                            background: 'white',
-                            padding: '0.75rem',
-                            borderRadius: '6px',
-                            border: '2px dashed #009688'
-                        }}>
-                            <div>
-                                <label style={{ ...labelStyle, color: '#00796b', fontWeight: '600' }}>
-                                    <TimeIcon sx={{ fontSize: '0.85rem' }} /> Días
-                                </label>
-                                <input type="number" step="0.5" name="dias" value={formData.dias} onChange={handleInputChange} required
-                                    style={{ ...inputStyle, border: '2px solid #009688', fontSize: '0.95rem', fontWeight: 'bold', textAlign: 'center' }}
-                                />
-                            </div>
-
-                            <div style={{ textAlign: 'center' }}>
-                                <label style={{ color: '#00796b', fontSize: '0.75rem', fontWeight: '600', marginBottom: '0.3rem', display: 'block' }}>
-                                    💵 TOTAL
-                                </label>
-                                <div style={{
-                                    background: 'linear-gradient(135deg, #009688 0%, #00796b 100%)',
-                                    color: 'white',
-                                    padding: '0.5rem',
-                                    borderRadius: '6px',
-                                    fontSize: '1.5rem',
-                                    fontWeight: 'bold',
-                                    boxShadow: '0 2px 8px rgba(0, 150, 136, 0.3)'
-                                }}>
-                                    ${totalCalculado.toFixed(2)}
-                                </div>
-                            </div>
-
-                            <button type="submit" style={{
-                                background: 'linear-gradient(135deg, #ec407a 0%, #d81b60 100%)',
-                                color: 'white',
-                                border: 'none',
-                                padding: '0.6rem 1.2rem',
-                                borderRadius: '6px',
-                                fontSize: '0.95rem',
-                                fontWeight: '600',
-                                cursor: 'pointer',
-                                boxShadow: '0 2px 8px rgba(236, 64, 122, 0.3)',
-                                whiteSpace: 'nowrap'
-                            }}>
-                                ➕ Agregar
-                            </button>
-                        </div>
-                    </form>
-
-                    {/* Tabla Compacta */}
-                    <div style={{
-                        background: 'white',
-                        padding: '0.75rem',
-                        borderRadius: '8px',
-                        border: '1px solid #e0e0e0'
+                    {/* SECCIÓN 2: CALCULADORA DE VIÁTICOS */}
+                    <Paper sx={{
+                        p: 3,
+                        bgcolor: '#1e293b',
+                        borderRadius: '16px',
+                        border: '1px solid #334155',
+                        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
                     }}>
-                        <h4 style={{
-                            color: '#00796b',
-                            margin: '0 0 0.6rem 0',
-                            fontSize: '0.95rem',
-                            fontWeight: '600'
+                        <Typography variant="subtitle1" sx={{
+                            color: '#2dd4bf',
+                            fontWeight: 800,
+                            mb: 2.5,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1
+                        }}>
+                            <CalculateIcon sx={{ fontSize: 20 }} /> Calculadora de Viáticos
+                        </Typography>
+
+                        <form onSubmit={handleSubmit}>
+                            <Grid container spacing={2.5}>
+                                <Grid item xs={12}>
+                                    <FormControl fullWidth size="small" sx={inputStyles}>
+                                        <InputLabel id="municipio-label">Municipio Destino</InputLabel>
+                                        <Select
+                                            labelId="municipio-label"
+                                            label="Municipio Destino"
+                                            name="id_municipio"
+                                            value={formData.id_municipio}
+                                            onChange={handleInputChange}
+                                            required
+                                            startAdornment={<LocationIcon sx={{ fontSize: 18, color: '#64748b', mr: 1 }} />}
+                                        >
+                                            <MenuItem value=""><em>Seleccionar</em></MenuItem>
+                                            {municipios.map(m => (
+                                                <MenuItem key={m.id_municipio} value={m.id_municipio}>{m.descripcion}</MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        label="Tarifa Diaria"
+                                        value={`$${parseFloat(formData.monto_diario || 0).toFixed(2)}`}
+                                        fullWidth
+                                        size="small"
+                                        InputProps={{
+                                            readOnly: true,
+                                            startAdornment: <InputAdornment position="start"><MoneyIcon sx={{ fontSize: 18, color: '#2dd4bf' }} /></InputAdornment>,
+                                            sx: { pointerEvents: 'none' } // Evitar interacción y efecto de click
+                                        }}
+                                        sx={{
+                                            ...inputStyles,
+                                            '& .MuiOutlinedInput-root': {
+                                                ...inputStyles['& .MuiOutlinedInput-root'],
+                                                bgcolor: '#1e293b',
+                                                '& input': {
+                                                    fontWeight: 800,
+                                                    color: '#2dd4bf',
+                                                    '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button': {
+                                                        '-webkit-appearance': 'none',
+                                                        margin: 0,
+                                                    },
+                                                    '&:-webkit-autofill': {
+                                                        WebkitBoxShadow: '0 0 0 100px #1e293b inset !important',
+                                                        WebkitTextFillColor: '#2dd4bf !important',
+                                                    },
+                                                },
+                                                // Forzar borde estático para evitar efectos al enfocar
+                                                '& fieldset': { borderColor: '#334155 !important' },
+                                                '&:hover fieldset': { borderColor: '#334155 !important' },
+                                                '&.Mui-focused fieldset': { borderColor: '#334155 !important' },
+                                            }
+                                        }}
+                                    />
+                                </Grid>
+
+                                <Grid item xs={12} sm={6}>
+                                    <Box sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        px: 2,
+                                        py: 0.5,
+                                        bgcolor: '#0f172a',
+                                        borderRadius: '12px',
+                                        border: '1px solid #334155',
+                                        height: '40px'
+                                    }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <HotelIcon sx={{ fontSize: 18, color: '#64748b' }} />
+                                            <Typography variant="body2" sx={{ color: '#94a3b8', fontWeight: 600 }}>Pernocta</Typography>
+                                        </Box>
+                                        <FormControlLabel
+                                            control={
+                                                <Switch
+                                                    checked={formData.pernocta}
+                                                    onChange={(e) => handleInputChange({ target: { name: 'pernocta', type: 'checkbox', checked: e.target.checked } })}
+                                                    sx={{
+                                                        '& .MuiSwitch-switchBase.Mui-checked': { color: '#2dd4bf' },
+                                                        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#2dd4bf' }
+                                                    }}
+                                                />
+                                            }
+                                            label={
+                                                <Typography sx={{
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: 800,
+                                                    color: formData.pernocta ? '#2dd4bf' : '#64748b',
+                                                    minWidth: 40
+                                                }}>
+                                                    {formData.pernocta ? 'SÍ' : 'NO'}
+                                                </Typography>
+                                            }
+                                            labelPlacement="start"
+                                        />
+                                    </Box>
+                                </Grid>
+
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        label="Fecha Inicio"
+                                        name="fecha_inicio"
+                                        type="date"
+                                        value={formData.fecha_inicio}
+                                        onChange={handleInputChange}
+                                        fullWidth
+                                        size="small"
+                                        InputLabelProps={{ shrink: true }}
+                                        error={!esFechaInicioValida(formData.fecha_inicio) && !!formData.fecha_inicio}
+                                        helperText={!esFechaInicioValida(formData.fecha_inicio) && !!formData.fecha_inicio ? `Debe ser después del ${new Date(fechaActividad).toLocaleDateString()}` : ''}
+                                        sx={inputStyles}
+                                    />
+                                </Grid>
+
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        label="Fecha Fin"
+                                        name="fecha_fin"
+                                        type="date"
+                                        value={formData.fecha_fin}
+                                        onChange={handleInputChange}
+                                        fullWidth
+                                        size="small"
+                                        InputLabelProps={{ shrink: true }}
+                                        error={!esFechaFinValida(formData.fecha_fin) && !!formData.fecha_fin}
+                                        helperText={!esFechaFinValida(formData.fecha_fin) && !!formData.fecha_fin ? `Debe ser después del ${new Date(fechaActividad).toLocaleDateString()}` : ''}
+                                        sx={inputStyles}
+                                    />
+                                </Grid>
+
+                                <Grid item xs={12}>
+                                    <Box sx={{
+                                        p: 2,
+                                        borderRadius: '12px',
+                                        bgcolor: '#0f172a',
+                                        border: '1px dashed #334155',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 3
+                                    }}>
+                                        {formData.pernocta && (
+                                            <TextField
+                                                label="Días"
+                                                name="dias"
+                                                type="number"
+                                                step="0.5"
+                                                value={formData.dias}
+                                                onChange={handleInputChange}
+                                                size="small"
+                                                sx={{ ...inputStyles, maxWidth: 100 }}
+                                            />
+                                        )}
+                                        <Box sx={{ flexGrow: 1, textAlign: 'right' }}>
+                                            <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 700, display: 'block' }}>TOTAL PROYECTADO</Typography>
+                                            <Typography variant="h4" sx={{ color: '#2dd4bf', fontWeight: 900 }}>${totalCalculado.toFixed(2)}</Typography>
+                                        </Box>
+                                        <Button
+                                            type="submit"
+                                            variant="contained"
+                                            disabled={actionLoading}
+                                            startIcon={actionLoading ? <CircularProgress size={20} /> : <AddIcon />}
+                                            sx={{
+                                                bgcolor: '#2dd4bf',
+                                                color: '#0f172a',
+                                                fontWeight: 800,
+                                                borderRadius: '10px',
+                                                px: 3,
+                                                '&:hover': { bgcolor: '#5eead4' }
+                                            }}
+                                        >
+                                            Agregar
+                                        </Button>
+                                    </Box>
+                                </Grid>
+                            </Grid>
+                        </form>
+                    </Paper>
+
+                    {/* SECCIÓN 3: VIÁTICOS REGISTRADOS (ROW-CARD LAYOUT) */}
+                    <Box>
+                        <Typography variant="subtitle1" sx={{
+                            color: '#64748b',
+                            fontWeight: 800,
+                            mb: 2,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1,
+                            textTransform: 'uppercase',
+                            fontSize: '0.75rem',
+                            letterSpacing: '0.05em'
                         }}>
                             📋 Viáticos Registrados
-                        </h4>
+                            {detalles.length > 0 && detalles[0].folio_comision && (
+                                <Chip
+                                    label={`FOLIO: ${detalles[0].folio_comision}`}
+                                    size="small"
+                                    sx={{
+                                        ml: 2,
+                                        bgcolor: 'rgba(56, 189, 248, 0.1)',
+                                        color: '#38bdf8',
+                                        fontWeight: 800,
+                                        border: '1px solid rgba(56, 189, 248, 0.2)'
+                                    }}
+                                />
+                            )}
+                        </Typography>
 
-                        <div>
-                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
-                                <thead>
-                                    <tr style={{ background: '#f5f5f5' }}>
-                                        <th style={{ padding: '0.5rem', textAlign: 'left', borderBottom: '2px solid #009688', color: '#00796b', fontWeight: '600', fontSize: '0.8rem' }}>
-                                            <LocationIcon sx={{ fontSize: '0.85rem', verticalAlign: 'middle', marginRight: '0.2rem' }} />Lugar
-                                        </th>
-                                        <th style={{ padding: '0.5rem', textAlign: 'center', borderBottom: '2px solid #009688', color: '#00796b', fontWeight: '600', fontSize: '0.8rem' }}>
-                                            <TimeIcon sx={{ fontSize: '0.85rem', verticalAlign: 'middle', marginRight: '0.2rem' }} />Días
-                                        </th>
-                                        <th style={{ padding: '0.5rem', textAlign: 'center', borderBottom: '2px solid #009688', color: '#00796b', fontWeight: '600', fontSize: '0.8rem' }}>
-                                            <HotelIcon sx={{ fontSize: '0.85rem', verticalAlign: 'middle', marginRight: '0.2rem' }} />Pernocta
-                                        </th>
-                                        <th style={{ padding: '0.5rem', textAlign: 'right', borderBottom: '2px solid #009688', color: '#00796b', fontWeight: '600', fontSize: '0.8rem' }}>
-                                            <MoneyIcon sx={{ fontSize: '0.85rem', verticalAlign: 'middle', marginRight: '0.2rem' }} />Monto
-                                        </th>
-                                        <th style={{ padding: '0.5rem', textAlign: 'center', borderBottom: '2px solid #009688', color: '#00796b', fontWeight: '600', fontSize: '0.8rem' }}>
-                                            Acciones
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {detalles.map((d, index) => (
-                                        <tr key={d.id_detalle_viatico} style={{ background: index % 2 === 0 ? 'white' : '#f9f9f9' }}>
-                                            <td style={{ padding: '0.5rem', borderBottom: '1px solid #e0e0e0' }}>{d.municipio_nombre}</td>
-                                            <td style={{ padding: '0.5rem', textAlign: 'center', borderBottom: '1px solid #e0e0e0', fontWeight: '500' }}>{d.dias}</td>
-                                            <td style={{ padding: '0.5rem', textAlign: 'center', borderBottom: '1px solid #e0e0e0' }}>
-                                                <span style={{
-                                                    background: d.pernocta ? '#4caf50' : '#ff9800',
-                                                    color: 'white',
-                                                    padding: '0.15rem 0.5rem',
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                            {detalles.map((d) => (
+                                <Paper key={d.id_detalle_viatico} sx={{
+                                    p: 2,
+                                    bgcolor: '#1e293b',
+                                    borderRadius: '16px',
+                                    border: '1px solid #334155',
+                                    transition: 'all 0.2s',
+                                    '&:hover': { bgcolor: '#243146', transform: 'translateY(-2px)' }
+                                }}>
+                                    <Grid container spacing={2} alignItems="center">
+                                        <Grid item xs={12} sm={4}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                <Box sx={{
+                                                    p: 1,
                                                     borderRadius: '10px',
-                                                    fontSize: '0.75rem',
-                                                    fontWeight: '600'
+                                                    bgcolor: d.municipio_nombre ? 'rgba(56, 189, 248, 0.1)' : 'rgba(234, 179, 8, 0.1)',
+                                                    color: d.municipio_nombre ? '#38bdf8' : '#eab308'
                                                 }}>
-                                                    {d.pernocta ? 'SÍ' : 'NO'}
-                                                </span>
-                                            </td>
-                                            <td style={{ padding: '0.5rem', textAlign: 'right', borderBottom: '1px solid #e0e0e0', fontWeight: '600', color: '#00796b' }}>
-                                                ${parseFloat(d.monto_calculado).toFixed(2)}
-                                            </td>
-                                            <td style={{ padding: '0.5rem', textAlign: 'center', borderBottom: '1px solid #e0e0e0' }}>
-                                                <button onClick={() => eliminarDetalle(d.id_detalle_viatico)}
-                                                    style={{
-                                                        background: '#f44336',
-                                                        color: 'white',
-                                                        border: 'none',
-                                                        padding: '0.3rem 0.5rem',
-                                                        borderRadius: '4px',
-                                                        cursor: 'pointer',
-                                                        fontSize: '0.75rem',
-                                                        display: 'inline-flex',
-                                                        alignItems: 'center',
-                                                        gap: '0.2rem'
-                                                    }}>
-                                                    <DeleteIcon sx={{ fontSize: '0.9rem' }} /> Eliminar
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {detalles.length === 0 && (
-                                        <tr>
-                                            <td colSpan="5" style={{ padding: '1.5rem', textAlign: 'center', color: '#90a4ae', fontStyle: 'italic', fontSize: '0.85rem' }}>
-                                                📭 Sin viáticos asignados
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                                                    {d.municipio_nombre ? <LocationIcon sx={{ fontSize: 20 }} /> : <MoneyIcon sx={{ fontSize: 20 }} />}
+                                                </Box>
+                                                <Box>
+                                                    <Typography sx={{ color: '#f8fafc', fontWeight: 800, fontSize: '0.9rem' }}>
+                                                        {d.municipio_nombre || 'Gastos Globales'}
+                                                    </Typography>
+                                                    <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
+                                                        {d.municipio_nombre ? 'Lugar de Comisión' : 'Administración'}
+                                                    </Typography>
+                                                </Box>
+                                            </Box>
+                                        </Grid>
+
+                                        <Grid item xs={6} sm={2}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <CalendarIcon sx={{ fontSize: 16, color: '#64748b' }} />
+                                                <Box>
+                                                    <Typography sx={{ color: '#cbd5e1', fontWeight: 700, fontSize: '0.8rem' }}>
+                                                        {d.fecha_inicio ? new Date(d.fecha_inicio).toLocaleDateString() : '-'}
+                                                    </Typography>
+                                                    <Typography variant="caption" sx={{ color: '#64748b' }}>Inicio</Typography>
+                                                </Box>
+                                            </Box>
+                                        </Grid>
+
+                                        <Grid item xs={6} sm={2}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <Box>
+                                                    <Typography sx={{ color: '#cbd5e1', fontWeight: 700, fontSize: '0.8rem' }}>
+                                                        {d.fecha_fin ? new Date(d.fecha_fin).toLocaleDateString() : '-'}
+                                                    </Typography>
+                                                    <Typography variant="caption" sx={{ color: '#64748b' }}>Fin</Typography>
+                                                </Box>
+                                            </Box>
+                                        </Grid>
+
+                                        <Grid item xs={6} sm={1}>
+                                            <Typography sx={{ color: '#f8fafc', fontWeight: 800, fontSize: '0.9rem', textAlign: 'center' }}>
+                                                {d.dias}
+                                            </Typography>
+                                            <Typography variant="caption" sx={{ color: '#64748b', display: 'block', textAlign: 'center' }}>Días</Typography>
+                                        </Grid>
+
+                                        <Grid item xs={6} sm={2}>
+                                            <Typography sx={{ color: d.municipio_nombre ? '#38bdf8' : '#eab308', fontWeight: 900, fontSize: '1rem', textAlign: 'right' }}>
+                                                ${parseFloat(d.monto_calculado || 0).toFixed(2)}
+                                            </Typography>
+                                            <Typography variant="caption" sx={{ color: '#64748b', display: 'block', textAlign: 'right' }}>Monto</Typography>
+                                        </Grid>
+
+                                        <Grid item xs={12} sm={1} sx={{ textAlign: 'right' }}>
+                                            <IconButton
+                                                onClick={() => eliminarDetalle(d.id_detalle_viatico)}
+                                                sx={{ color: '#ef4444', '&:hover': { bgcolor: 'rgba(239, 68, 68, 0.1)' } }}
+                                            >
+                                                <DeleteIcon sx={{ fontSize: 20 }} />
+                                            </IconButton>
+                                        </Grid>
+                                    </Grid>
+                                </Paper>
+                            ))}
+
+                            {detalles.length === 0 && (
+                                <Box sx={{ p: 4, textAlign: 'center', border: '2px dashed #1e293b', borderRadius: '16px' }}>
+                                    <Typography sx={{ color: '#64748b', fontStyle: 'italic' }}>
+                                        📭 Sin viáticos asignados
+                                    </Typography>
+                                </Box>
+                            )}
+
+                            {/* Fila de Totales */}
+                            <Paper sx={{
+                                p: 2,
+                                bgcolor: '#0f172a',
+                                borderRadius: '16px',
+                                border: '1px solid #38bdf8',
+                                mt: 1,
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center'
+                            }}>
+                                <Box>
+                                    <Typography variant="h6" sx={{ color: '#38bdf8', fontWeight: 900 }}>
+                                        TOTAL GENERAL
+                                    </Typography>
+                                    <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 700 }}>
+                                        Viáticos + Gastos Globales
+                                    </Typography>
+                                </Box>
+                                <Typography variant="h4" sx={{ color: '#38bdf8', fontWeight: 900 }}>
+                                    ${(
+                                        detalles.reduce((sum, d) => sum + parseFloat(d.monto_calculado || 0), 0) +
+                                        (gastosGlobales ? (parseFloat(gastosGlobales.pasaje || 0) + parseFloat(gastosGlobales.combustible || 0) + parseFloat(gastosGlobales.otros || 0)) : 0)
+                                    ).toFixed(2)}
+                                </Typography>
+                            </Paper>
+                        </Box>
+                    </Box>
+
+                    {/* SECCIÓN DE FIRMAS */}
+                    <Paper sx={{
+                        p: 3,
+                        bgcolor: '#1e293b',
+                        borderRadius: '16px',
+                        border: '1px solid #334155',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                    }}>
+                        <Typography variant="subtitle1" sx={{ color: '#94a3b8', fontWeight: 800, mb: 2.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+                            ✍️ Firmas del Memorándum
+                        </Typography>
+
+                        <Grid container spacing={3}>
+                            <Grid item xs={12} sm={6}>
+                                <Box sx={{ p: 2, bgcolor: '#0f172a', borderRadius: '12px', border: '1px solid #1e293b' }}>
+                                    <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 700, display: 'block', mb: 1 }}>AUTORIZA</Typography>
+                                    <Typography sx={{ color: '#f8fafc', fontWeight: 800, fontSize: '0.9rem' }}>
+                                        {firmas[0]?.nombre_firma || 'Cargando...'}
+                                    </Typography>
+                                    <Typography variant="caption" sx={{ color: '#64748b', display: 'block' }}>
+                                        {firmas[0]?.cargo_firma}
+                                    </Typography>
+                                </Box>
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                                {firmasFijasDisponibles.length > 1 ? (
+                                    <FormControl fullWidth size="small" sx={inputStyles}>
+                                        <InputLabel id="firma-fija-label">Jefe de Unidad (Firma Fija)</InputLabel>
+                                        <Select
+                                            labelId="firma-fija-label"
+                                            label="Jefe de Unidad (Firma Fija)"
+                                            name="id_firma_fija"
+                                            value={formData.id_firma_fija}
+                                            onChange={handleInputChange}
+                                            required
+                                        >
+                                            <MenuItem value=""><em>Seleccionar</em></MenuItem>
+                                            {firmasFijasDisponibles.map(firma => (
+                                                <MenuItem key={firma.id_firma} value={firma.id_firma}>
+                                                    {firma.nombre_firma}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                ) : (
+                                    <Box sx={{ p: 2, bgcolor: '#0f172a', borderRadius: '12px', border: '1px solid #1e293b' }}>
+                                        <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 700, display: 'block', mb: 1 }}>JEFE DE UNIDAD</Typography>
+                                        <Typography sx={{ color: '#f8fafc', fontWeight: 800, fontSize: '0.9rem' }}>
+                                            {firmas[1]?.nombre_firma || 'Cargando...'}
+                                        </Typography>
+                                        <Typography variant="caption" sx={{ color: '#64748b', display: 'block' }}>
+                                            {firmas[1]?.cargo_firma}
+                                        </Typography>
+                                    </Box>
+                                )}
+                            </Grid>
+                        </Grid>
+                    </Paper>
+                </Box>
+            </DialogContent>
+
+
+            {/* DIÁLOGO DE CONFIRMACIÓN PARA ELIMINAR */}
+            <Dialog
+                open={deleteConfirm.open}
+                onClose={() => setDeleteConfirm({ open: false, id: null })}
+                PaperProps={{
+                    sx: {
+                        bgcolor: '#1e293b',
+                        color: '#f8fafc',
+                        borderRadius: '20px',
+                        border: '1px solid #334155',
+                        p: 1
+                    }
+                }}
+            >
+                <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1.5, pb: 1 }}>
+                    <WarningIcon sx={{ color: '#ef4444' }} />
+                    <Typography variant="h6" sx={{ fontWeight: 800 }}>Confirmar Eliminación</Typography>
+                </DialogTitle>
+                <DialogContent>
+                    <Typography sx={{ color: '#94a3b8', fontWeight: 500 }}>
+                        ¿Está seguro que desea eliminar este registro de viático? Esta acción no se puede deshacer.
+                    </Typography>
+                </DialogContent>
+                <DialogActions sx={{ p: 2.5, gap: 1 }}>
+                    <Button
+                        onClick={() => setDeleteConfirm({ open: false, id: null })}
+                        sx={{ color: '#64748b', fontWeight: 700, textTransform: 'none' }}
+                    >
+                        Cancelar
+                    </Button>
+                    <Button
+                        onClick={handleConfirmDelete}
+                        disabled={actionLoading}
+                        variant="contained"
+                        sx={{
+                            bgcolor: '#ef4444',
+                            '&:hover': { bgcolor: '#dc2626' },
+                            borderRadius: '10px',
+                            fontWeight: 800,
+                            textTransform: 'none',
+                            px: 3
+                        }}
+                    >
+                        {actionLoading ? <CircularProgress size={20} color="inherit" /> : 'Eliminar Registro'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={() => setSnackbar({ ...snackbar, open: false })}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert
+                    onClose={() => setSnackbar({ ...snackbar, open: false })}
+                    severity={snackbar.severity}
+                    variant="filled"
+                    sx={{ borderRadius: '12px', fontWeight: 600 }}
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
+        </Dialog>
     );
 };
 

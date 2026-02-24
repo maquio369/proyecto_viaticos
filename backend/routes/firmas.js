@@ -50,27 +50,87 @@ router.get('/todas', async (req, res) => {
 router.get('/empleado/:id_empleado', async (req, res) => {
   try {
     const { id_empleado } = req.params;
-    
-    // Firmas por área del empleado + firmas adicionales
-    const result = await pool.query(`
-      SELECT DISTINCT f.id_firma, f.nombre_firma, f.cargo_firma,
-             CASE 
-               WHEN fa.id_area IS NOT NULL THEN 'area'
-               ELSE 'adicional'
-             END as tipo_asignacion
-      FROM empleados e
-      LEFT JOIN firmas_por_area fa ON e.id_area = fa.id_area AND fa.esta_borrado = false
-      LEFT JOIN firmas_adicionales_empleado fae ON e.id_empleado = fae.id_empleado AND fae.esta_borrado = false
-      JOIN firmas f ON (f.id_firma = fa.id_firma OR f.id_firma = fae.id_firma)
-      WHERE e.id_empleado = $1 AND e.esta_borrado = false AND f.esta_borrado = false
-      ORDER BY f.nombre_firma
-    `, [id_empleado]);
+
+    // Verificar si existe la tabla de excepciones
+    const tablaExiste = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = 'excepciones_firmas_empleado'
+      )
+    `);
+
+    const tieneExcepciones = tablaExiste.rows[0].exists;
+
+    let query;
+    if (tieneExcepciones) {
+      // Query con excepciones
+      query = `
+        SELECT f.id_firma, f.nombre_firma, f.cargo_firma, 'area' as tipo_asignacion
+        FROM empleados e
+        JOIN firmas_por_area fa ON e.id_area = fa.id_area
+        JOIN firmas f ON fa.id_firma = f.id_firma
+        WHERE e.id_empleado = $1 
+          AND e.esta_borrado = false 
+          AND fa.esta_borrado = false 
+          AND f.esta_borrado = false
+          AND f.id_firma NOT IN (
+            SELECT id_firma FROM firmas_adicionales_empleado 
+            WHERE id_empleado = $1 AND esta_borrado = false
+          )
+          AND f.id_firma NOT IN (
+            SELECT id_firma FROM excepciones_firmas_empleado
+            WHERE id_empleado = $1
+          )
+
+        UNION ALL
+
+        SELECT f.id_firma, f.nombre_firma, f.cargo_firma, 'adicional' as tipo_asignacion
+        FROM firmas_adicionales_empleado fae
+        JOIN firmas f ON fae.id_firma = f.id_firma
+        WHERE fae.id_empleado = $1 
+          AND fae.esta_borrado = false 
+          AND f.esta_borrado = false
+
+        ORDER BY nombre_firma
+      `;
+    } else {
+      // Query sin excepciones (para cuando no existe la tabla)
+      query = `
+        SELECT f.id_firma, f.nombre_firma, f.cargo_firma, 'area' as tipo_asignacion
+        FROM empleados e
+        JOIN firmas_por_area fa ON e.id_area = fa.id_area
+        JOIN firmas f ON fa.id_firma = f.id_firma
+        WHERE e.id_empleado = $1 
+          AND e.esta_borrado = false 
+          AND fa.esta_borrado = false 
+          AND f.esta_borrado = false
+          AND f.id_firma NOT IN (
+            SELECT id_firma FROM firmas_adicionales_empleado 
+            WHERE id_empleado = $1 AND esta_borrado = false
+          )
+
+        UNION ALL
+
+        SELECT f.id_firma, f.nombre_firma, f.cargo_firma, 'adicional' as tipo_asignacion
+        FROM firmas_adicionales_empleado fae
+        JOIN firmas f ON fae.id_firma = f.id_firma
+        WHERE fae.id_empleado = $1 
+          AND fae.esta_borrado = false 
+          AND f.esta_borrado = false
+
+        ORDER BY nombre_firma
+      `;
+    }
+
+    const result = await pool.query(query, [id_empleado]);
 
     res.json({
       success: true,
       firmas: result.rows
     });
   } catch (error) {
+    console.error('Error en /empleado/:id_empleado:', error);
     res.status(500).json({
       success: false,
       error: error.message
@@ -159,14 +219,55 @@ router.delete('/eliminar-adicional/:id_empleado/:id_firma', auth, async (req, re
   try {
     const { id_empleado, id_firma } = req.params;
 
-    await pool.query(
-      'UPDATE firmas_adicionales_empleado SET esta_borrado = true WHERE id_empleado = $1 AND id_firma = $2',
+    // 1. Intentar eliminar de firmas adicionales primero
+    const resultAdicional = await pool.query(
+      'UPDATE firmas_adicionales_empleado SET esta_borrado = true WHERE id_empleado = $1 AND id_firma = $2 RETURNING id',
       [id_empleado, id_firma]
     );
 
-    res.json({
-      success: true,
-      message: 'Firma adicional eliminada exitosamente'
+    if (resultAdicional.rowCount > 0) {
+      return res.json({
+        success: true,
+        message: 'Firma adicional eliminada exitosamente'
+      });
+    }
+
+    // 2. Si no estaba como adicional, verificar si es de área para agregar excepción
+    const esFirmaArea = await pool.query(`
+      SELECT f.id_firma
+      FROM empleados e
+      JOIN firmas_por_area fa ON e.id_area = fa.id_area
+      JOIN firmas f ON fa.id_firma = f.id_firma
+      WHERE e.id_empleado = $1 
+        AND f.id_firma = $2
+        AND e.esta_borrado = false 
+        AND fa.esta_borrado = false 
+        AND f.esta_borrado = false
+    `, [id_empleado, id_firma]);
+
+    if (esFirmaArea.rows.length > 0) {
+      // Verificar si ya existe excepción
+      const existeExcepcion = await pool.query(
+        'SELECT id FROM excepciones_firmas_empleado WHERE id_empleado = $1 AND id_firma = $2',
+        [id_empleado, id_firma]
+      );
+
+      if (existeExcepcion.rows.length === 0) {
+        await pool.query(
+          'INSERT INTO excepciones_firmas_empleado (id_empleado, id_firma) VALUES ($1, $2)',
+          [id_empleado, id_firma]
+        );
+      }
+
+      return res.json({
+        success: true,
+        message: 'Firma de área excluida para este empleado'
+      });
+    }
+
+    return res.status(404).json({
+      success: false,
+      message: 'No se encontró la firma asignada para eliminar o excluir'
     });
   } catch (error) {
     res.status(500).json({

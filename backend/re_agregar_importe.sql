@@ -1,0 +1,1 @@
+ALTER TABLE tramites ADD COLUMN importe DECIMAL(10,2) DEFAULT 0;
