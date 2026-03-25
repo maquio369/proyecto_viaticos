@@ -13,7 +13,11 @@ const empleadosRoutes = require('./routes/empleados');
 const app = express();
 
 app.use(cors({
-  origin: true, // Allow any origin for development
+  origin: [
+    'http://sag.chiapas.gob.mx:27',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000'
+  ],
   credentials: true
 }));
 app.use(express.json());
@@ -30,6 +34,9 @@ app.use('/api/tarifas', require('./routes/tarifas'));
 app.use('/api/viaticos', require('./routes/viaticos'));
 app.use('/api/gastos-globales', require('./routes/gastosGlobales'));
 app.use('/api/tramites', require('./routes/tramites'));
+app.use('/api/categorias', require('./routes/categorias'));
+app.use('/api/areas', require('./routes/areas'));
+app.use('/api/reportes', require('./routes/reportes'));
 
 app.get('/', (req, res) => {
   res.json({ message: 'API Sistema de Viáticos funcionando' });

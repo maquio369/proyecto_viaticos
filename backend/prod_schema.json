@@ -1,0 +1,4250 @@
+[
+  {
+    "table_name": "actividades_institucionales",
+    "column_name": "id_actividad_institucional",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "actividades_institucionales",
+    "column_name": "clave_actividad_institucional",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "actividades_institucionales",
+    "column_name": "descripcion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "actividades_institucionales",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "analitico_de_ministraciones",
+    "column_name": "id_analitico_de_ministracion",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "analitico_de_ministraciones",
+    "column_name": "id_ministracion",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "analitico_de_ministraciones",
+    "column_name": "id_clave_presupuestaria",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "analitico_de_ministraciones",
+    "column_name": "id_fondo_centralizado",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "analitico_de_ministraciones",
+    "column_name": "importe",
+    "data_type": "numeric",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_name": "analitico_de_ministraciones",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": "false"
+  },
+  {
+    "table_name": "areas",
+    "column_name": "id_area",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "areas",
+    "column_name": "id_estructura_administrativa",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "areas",
+    "column_name": "clave_area",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "areas",
+    "column_name": "clave_subarea",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "areas",
+    "column_name": "clave_ocupacion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "areas",
+    "column_name": "descripcion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "areas",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "areas",
+    "column_name": "abreviatura",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "asignaciones_del_gasto",
+    "column_name": "id_asignacion_del_gasto",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "asignaciones_del_gasto",
+    "column_name": "clave_asignacion_del_gasto",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "asignaciones_del_gasto",
+    "column_name": "descripcion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "asignaciones_del_gasto",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "años",
+    "column_name": "id_año_del_gasto",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "años",
+    "column_name": "año_del_gasto",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "años",
+    "column_name": "ciclo_presupuestario",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "años",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "calendarizado",
+    "column_name": "id_calendarizado",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "calendarizado",
+    "column_name": "id_clave_presupuestaria",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "calendarizado",
+    "column_name": "enero",
+    "data_type": "numeric",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_name": "calendarizado",
+    "column_name": "febrero",
+    "data_type": "numeric",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_name": "calendarizado",
+    "column_name": "marzo",
+    "data_type": "numeric",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_name": "calendarizado",
+    "column_name": "abril",
+    "data_type": "numeric",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_name": "calendarizado",
+    "column_name": "mayo",
+    "data_type": "numeric",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_name": "calendarizado",
+    "column_name": "junio",
+    "data_type": "numeric",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_name": "calendarizado",
+    "column_name": "julio",
+    "data_type": "numeric",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_name": "calendarizado",
+    "column_name": "agosto",
+    "data_type": "numeric",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_name": "calendarizado",
+    "column_name": "septiembre",
+    "data_type": "numeric",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_name": "calendarizado",
+    "column_name": "octubre",
+    "data_type": "numeric",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_name": "calendarizado",
+    "column_name": "noviembre",
+    "data_type": "numeric",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_name": "calendarizado",
+    "column_name": "diciembre",
+    "data_type": "numeric",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_name": "calendarizado",
+    "column_name": "no_liberado",
+    "data_type": "numeric",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_name": "calendarizado",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": "false"
+  },
+  {
+    "table_name": "cargos",
+    "column_name": "id_cargo",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "cargos",
+    "column_name": "cargo",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "cargos",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "clases_de_vehiculos",
+    "column_name": "id_clase_de_vehiculo",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "clases_de_vehiculos",
+    "column_name": "clase_de_vehiculo",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "clases_de_vehiculos",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "clasificaciones_funcionales",
+    "column_name": "id_clasificacion_funcional",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "clasificaciones_funcionales",
+    "column_name": "clave_finalidad",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "clasificaciones_funcionales",
+    "column_name": "clave_funcion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "clasificaciones_funcionales",
+    "column_name": "clave_subfuncion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "clasificaciones_funcionales",
+    "column_name": "clave_subsubfuncion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "clasificaciones_funcionales",
+    "column_name": "descripcion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "clasificaciones_funcionales",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "claves_presupuestarias",
+    "column_name": "id_clave_presupuestaria",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "claves_presupuestarias",
+    "column_name": "id_municipio",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "claves_presupuestarias",
+    "column_name": "id_asignacion_del_gasto",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "claves_presupuestarias",
+    "column_name": "id_objeto_del_gasto_por_categoria",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "claves_presupuestarias",
+    "column_name": "id_objeto_del_gasto",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "claves_presupuestarias",
+    "column_name": "id_orientacion_del_gasto",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "claves_presupuestarias",
+    "column_name": "id_año_del_gasto",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "claves_presupuestarias",
+    "column_name": "id_tipo_de_gasto",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "claves_presupuestarias",
+    "column_name": "id_financiamiento",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "claves_presupuestarias",
+    "column_name": "id_subfuente_de_financiamiento",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "claves_presupuestarias",
+    "column_name": "id_ciclo_presupuestario",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "claves_presupuestarias",
+    "column_name": "id_rubro_de_ingreso",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "claves_presupuestarias",
+    "column_name": "id_digito_de_ministracion",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "claves_presupuestarias",
+    "column_name": "aprobado",
+    "data_type": "numeric",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_name": "claves_presupuestarias",
+    "column_name": "id_proyecto_estrategico",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "claves_presupuestarias",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "coberturas",
+    "column_name": "id_cobertura",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "coberturas",
+    "column_name": "cobertura",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "coberturas",
+    "column_name": "abreviatura",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "coberturas",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "digitos_de_ministracion",
+    "column_name": "id_digito_de_ministracion",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "digitos_de_ministracion",
+    "column_name": "clave_digito_de_ministracion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "digitos_de_ministracion",
+    "column_name": "descripcion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "digitos_de_ministracion",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "empleados",
+    "column_name": "id_empleado",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "empleados",
+    "column_name": "prefijo",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "empleados",
+    "column_name": "nombres",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "empleados",
+    "column_name": "apellido1",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "empleados",
+    "column_name": "apellido2",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "empleados",
+    "column_name": "id_cargo",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "empleados",
+    "column_name": "correo",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "empleados",
+    "column_name": "telefonos_oficina",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "empleados",
+    "column_name": "id_area",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "empleados",
+    "column_name": "id_empleado_datos_laborales",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "empleados",
+    "column_name": "fecha_ingreso",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "empleados",
+    "column_name": "fecha_baja",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "empleados",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "empleados_datos_laborales",
+    "column_name": "id_empleado_datos_laborales",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "empleados_datos_laborales",
+    "column_name": "rfc",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "empleados_datos_laborales",
+    "column_name": "num_empleado",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "empleados_datos_laborales",
+    "column_name": "curp",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "empleados_datos_laborales",
+    "column_name": "nss",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "empleados_datos_laborales",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "empleados_externos",
+    "column_name": "id_empleado_externo",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "empleados_externos",
+    "column_name": "empleado_externo",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "empleados_externos",
+    "column_name": "telefono",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "empleados_externos",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "estatus_de_captura",
+    "column_name": "id_estatus_de_captura",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "estatus_de_captura",
+    "column_name": "estatus_de_captura",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "estatus_de_captura",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "estatus_de_vehiculos",
+    "column_name": "id_estatus_de_vehiculo",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "estatus_de_vehiculos",
+    "column_name": "estatus_de_vehiculo",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "estatus_de_vehiculos",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "estatus_del_proyecto",
+    "column_name": "id_estatus_del_proyecto",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "estatus_del_proyecto",
+    "column_name": "estatus_del_proyecto",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "estatus_del_proyecto",
+    "column_name": "abreviatura",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "estatus_del_proyecto",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "estructuras_administrativas",
+    "column_name": "id_estructura_administrativa",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "estructuras_administrativas",
+    "column_name": "clave_clasificacion_administrativa",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "estructuras_administrativas",
+    "column_name": "clave_unidad_responsable",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "estructuras_administrativas",
+    "column_name": "clave_uro",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "estructuras_administrativas",
+    "column_name": "descripcion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "estructuras_administrativas",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "estructuras_administrativas",
+    "column_name": "abreviatura",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "facturas_concluidas",
+    "column_name": "id_factura_concluida",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "facturas_concluidas",
+    "column_name": "id_requisicion_de_entrada",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "facturas_concluidas",
+    "column_name": "id_vale_de_entrada",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "facturas_concluidas",
+    "column_name": "id_requisicion_de_salida",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "facturas_concluidas",
+    "column_name": "id_vale_de_salida",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "facturas_concluidas",
+    "column_name": "id_producto_generico",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "facturas_concluidas",
+    "column_name": "cantidad_usada",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "facturas_concluidas",
+    "column_name": "merma_factura",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": "false"
+  },
+  {
+    "table_name": "facturas_concluidas",
+    "column_name": "es_registro_final",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": "false"
+  },
+  {
+    "table_name": "facturas_concluidas_om",
+    "column_name": "id_factura_concluida_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "facturas_concluidas_om",
+    "column_name": "id_requisicion_de_entrada_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "facturas_concluidas_om",
+    "column_name": "id_vale_de_entrada_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "facturas_concluidas_om",
+    "column_name": "id_requisicion_de_salida_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "facturas_concluidas_om",
+    "column_name": "id_vale_de_salida_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "facturas_concluidas_om",
+    "column_name": "id_producto_generico_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "facturas_concluidas_om",
+    "column_name": "cantidad_usada",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "facturas_concluidas_om",
+    "column_name": "merma_factura",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": "false"
+  },
+  {
+    "table_name": "facturas_concluidas_om",
+    "column_name": "es_registro_final",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": "false"
+  },
+  {
+    "table_name": "fondos_centralizados",
+    "column_name": "id_fondo_centralizado",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "fondos_centralizados",
+    "column_name": "fondo_centralizado",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "fondos_centralizados",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": "false"
+  },
+  {
+    "table_name": "fuentes_de_financiamiento",
+    "column_name": "id_fuente_de_financiamiento",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "fuentes_de_financiamiento",
+    "column_name": "clave_fuente_de_financiamiento",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "fuentes_de_financiamiento",
+    "column_name": "descripcion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "fuentes_de_financiamiento",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "marcas_de_vehiculos",
+    "column_name": "id_marca_de_vehiculo",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "marcas_de_vehiculos",
+    "column_name": "marca_de_vehiculo",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "marcas_de_vehiculos",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "ministraciones",
+    "column_name": "id_ministracion",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "ministraciones",
+    "column_name": "ministracion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "ministraciones",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": "false"
+  },
+  {
+    "table_name": "municipios",
+    "column_name": "id_municipio",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "municipios",
+    "column_name": "clave_municipio",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "municipios",
+    "column_name": "descripcion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "municipios",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "niveles_de_acceso",
+    "column_name": "id_nivel_de_acceso",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "niveles_de_acceso",
+    "column_name": "nivel_de_acceso",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "niveles_de_acceso",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "objetos_del_gasto",
+    "column_name": "id_objeto_del_gasto",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "objetos_del_gasto",
+    "column_name": "clave_capitulo",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "objetos_del_gasto",
+    "column_name": "clave_concepto",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "objetos_del_gasto",
+    "column_name": "clave_partida",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "objetos_del_gasto",
+    "column_name": "clave_gasto",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "objetos_del_gasto",
+    "column_name": "descripcion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "objetos_del_gasto",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": "false"
+  },
+  {
+    "table_name": "objetos_del_gasto_por_categoria",
+    "column_name": "id_objeto_del_gasto_por_categoria",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "objetos_del_gasto_por_categoria",
+    "column_name": "clave_objeto_del_gasto_por_categoria",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "objetos_del_gasto_por_categoria",
+    "column_name": "descripcion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "objetos_del_gasto_por_categoria",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "opciones",
+    "column_name": "id_opcion",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "opciones",
+    "column_name": "id_sistema",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "opciones",
+    "column_name": "opcion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "opciones",
+    "column_name": "descripcion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "opciones",
+    "column_name": "link",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "opciones",
+    "column_name": "icono",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "opciones",
+    "column_name": "id_opcion_padre",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "opciones",
+    "column_name": "orden",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "opciones",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "orientaciones_del_gasto",
+    "column_name": "id_orientacion_del_gasto",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "orientaciones_del_gasto",
+    "column_name": "clave_orientacion_del_gasto",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "orientaciones_del_gasto",
+    "column_name": "descripcion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "orientaciones_del_gasto",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "origenes_de_asignacion",
+    "column_name": "id_origen_de_asignacion",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "origenes_de_asignacion",
+    "column_name": "clave_origen_de_asignacion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "origenes_de_asignacion",
+    "column_name": "descripcion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "origenes_de_asignacion",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "partidas",
+    "column_name": "id_partida",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "partidas",
+    "column_name": "clave_objeto_del_gasto",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "partidas",
+    "column_name": "partida",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "partidas",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "partidas",
+    "column_name": "id_objeto_del_gasto",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "permisos",
+    "column_name": "id_rol",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "permisos",
+    "column_name": "id_opcion",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "permisos",
+    "column_name": "id_nivel_de_acceso",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": "3"
+  },
+  {
+    "table_name": "permisos",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "productos",
+    "column_name": "id_producto",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "productos",
+    "column_name": "id_producto_generico",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "productos",
+    "column_name": "codigo",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "productos",
+    "column_name": "id_unidad",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "productos",
+    "column_name": "cantidad_secundaria",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "productos",
+    "column_name": "id_unidad_secundaria",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "productos",
+    "column_name": "descripcion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "productos",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "productos_genericos",
+    "column_name": "id_producto_generico",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "productos_genericos",
+    "column_name": "id_partida",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "productos_genericos",
+    "column_name": "producto_generico",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "productos_genericos",
+    "column_name": "existencia_oficialia",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_name": "productos_genericos",
+    "column_name": "existencia",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_name": "productos_genericos",
+    "column_name": "stock_min",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": "0"
+  },
+  {
+    "table_name": "productos_genericos",
+    "column_name": "stock_sugerido",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": "0"
+  },
+  {
+    "table_name": "productos_genericos",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "productos_genericos_om",
+    "column_name": "id_producto_generico_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "productos_genericos_om",
+    "column_name": "id_partida",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "productos_genericos_om",
+    "column_name": "producto_generico",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "productos_genericos_om",
+    "column_name": "existencia_oficialia",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_name": "productos_genericos_om",
+    "column_name": "existencia",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_name": "productos_genericos_om",
+    "column_name": "stock_min",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": "0"
+  },
+  {
+    "table_name": "productos_genericos_om",
+    "column_name": "stock_sugerido",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": "0"
+  },
+  {
+    "table_name": "productos_genericos_om",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "productos_om",
+    "column_name": "id_producto_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "productos_om",
+    "column_name": "id_producto_generico_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "productos_om",
+    "column_name": "codigo",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "productos_om",
+    "column_name": "id_unidad",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "productos_om",
+    "column_name": "cantidad_secundaria",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "productos_om",
+    "column_name": "id_unidad_secundaria",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "productos_om",
+    "column_name": "descripcion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "productos_om",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "programas_presupuestarios",
+    "column_name": "id_programa_presupuestario",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "programas_presupuestarios",
+    "column_name": "clave_programa_presupuestario",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "programas_presupuestarios",
+    "column_name": "descripcion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "programas_presupuestarios",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "programas_sectoriales",
+    "column_name": "id_programa_sectorial",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "programas_sectoriales",
+    "column_name": "clave_programa_sectorial",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "programas_sectoriales",
+    "column_name": "descripcion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "programas_sectoriales",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "programas_y_fondos",
+    "column_name": "id_financiamiento",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "programas_y_fondos",
+    "column_name": "clave_tipo_de_recurso",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "programas_y_fondos",
+    "column_name": "clave_fuente_de_financiamiento",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "programas_y_fondos",
+    "column_name": "clave_ramo",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "programas_y_fondos",
+    "column_name": "clave_fondo",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "programas_y_fondos",
+    "column_name": "descripcion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "programas_y_fondos",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "proveedores",
+    "column_name": "id_proveedor",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "proveedores",
+    "column_name": "proveedor",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "proveedores",
+    "column_name": "rfc",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "proveedores",
+    "column_name": "domicilio",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "proveedores",
+    "column_name": "telefono",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "proveedores",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "proveedores_om",
+    "column_name": "id_proveedor_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "proveedores_om",
+    "column_name": "proveedor",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "proveedores_om",
+    "column_name": "rfc",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "proveedores_om",
+    "column_name": "domicilio",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "proveedores_om",
+    "column_name": "telefono",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "proveedores_om",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "proyectos_estrategicos",
+    "column_name": "id_proyecto_estrategico",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "proyectos_estrategicos",
+    "column_name": "id_año_del_gasto",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "proyectos_estrategicos",
+    "column_name": "id_estructura_administrativa",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "proyectos_estrategicos",
+    "column_name": "id_clasificacion_funcional",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "proyectos_estrategicos",
+    "column_name": "id_programa_sectorial",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "proyectos_estrategicos",
+    "column_name": "id_programa_presupuestario",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "proyectos_estrategicos",
+    "column_name": "id_origen_de_asignacion",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "proyectos_estrategicos",
+    "column_name": "id_actividad_institucional",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "proyectos_estrategicos",
+    "column_name": "id_asignacion_del_gasto",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "proyectos_estrategicos",
+    "column_name": "proyecto_estrategico",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "proyectos_estrategicos",
+    "column_name": "nombre_tecnico",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "proyectos_estrategicos",
+    "column_name": "id_tipo_de_proyecto",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "proyectos_estrategicos",
+    "column_name": "id_cobertura",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "proyectos_estrategicos",
+    "column_name": "id_tipo_de_accion",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "proyectos_estrategicos",
+    "column_name": "inicio",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "proyectos_estrategicos",
+    "column_name": "termino",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "proyectos_estrategicos",
+    "column_name": "id_lider_del_proyecto",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "proyectos_estrategicos",
+    "column_name": "id_jefe_del_lider",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "proyectos_estrategicos",
+    "column_name": "id_estatus_del_proyecto",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "proyectos_estrategicos",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "puestos",
+    "column_name": "puesto_id",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "puestos",
+    "column_name": "puesto",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "puestos",
+    "column_name": "esta_activo",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "true"
+  },
+  {
+    "table_name": "ramos",
+    "column_name": "id_ramo",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "ramos",
+    "column_name": "clave_ramo",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "ramos",
+    "column_name": "descripcion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "ramos",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "repartidores",
+    "column_name": "id_repartidor",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "repartidores",
+    "column_name": "repartidor",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "repartidores",
+    "column_name": "telefono",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "repartidores",
+    "column_name": "id_proveedor",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "repartidores",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "repartidores_om",
+    "column_name": "id_repartidor_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "repartidores_om",
+    "column_name": "repartidor",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "repartidores_om",
+    "column_name": "telefono",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "repartidores_om",
+    "column_name": "id_proveedor_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "repartidores_om",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "requisiciones_de_entrada",
+    "column_name": "id_requisicion_de_entrada",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "requisiciones_de_entrada",
+    "column_name": "requisicion_de_entrada",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "requisiciones_de_entrada",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "requisiciones_de_entrada_om",
+    "column_name": "id_requisicion_de_entrada_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "requisiciones_de_entrada_om",
+    "column_name": "requisicion_de_entrada",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "requisiciones_de_entrada_om",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "requisiciones_de_salida",
+    "column_name": "id_requisicion_de_salida",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "requisiciones_de_salida",
+    "column_name": "requisicion_de_salida",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "requisiciones_de_salida",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "requisiciones_de_salida_om",
+    "column_name": "id_requisicion_de_salida_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "requisiciones_de_salida_om",
+    "column_name": "requisicion_de_salida",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "requisiciones_de_salida_om",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "requisiciones_detalle",
+    "column_name": "requisicion_detalle_id",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "requisiciones_detalle",
+    "column_name": "cantidad",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "requisiciones_detalle",
+    "column_name": "observacion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "requisiciones_detalle",
+    "column_name": "producto_id",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "requisiciones_detalle",
+    "column_name": "requisicion_id",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "requisiciones_detalle",
+    "column_name": "precio",
+    "data_type": "numeric",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "requisiciones_detalle",
+    "column_name": "esta_activo",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "true"
+  },
+  {
+    "table_name": "roles",
+    "column_name": "id_rol",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "roles",
+    "column_name": "rol",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "roles",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "rubros_de_ingreso",
+    "column_name": "id_rubro_de_ingreso",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "rubros_de_ingreso",
+    "column_name": "clave_rubro_de_ingreso",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "rubros_de_ingreso",
+    "column_name": "descripcion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "rubros_de_ingreso",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "sistemas",
+    "column_name": "id_sistema",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "sistemas",
+    "column_name": "sistema",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "sistemas",
+    "column_name": "grupo",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "sistemas",
+    "column_name": "abreviatura",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "sistemas",
+    "column_name": "objetivo",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "sistemas",
+    "column_name": "id_sistema_padre",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "sistemas",
+    "column_name": "icono",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "sistemas",
+    "column_name": "estilo",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "sistemas",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": "false"
+  },
+  {
+    "table_name": "subfuentes_de_financiamiento",
+    "column_name": "id_subfuente_de_financiamiento",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "subfuentes_de_financiamiento",
+    "column_name": "clave_subfuente_de_financiamiento",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "subfuentes_de_financiamiento",
+    "column_name": "descripcion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "subfuentes_de_financiamiento",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "tipos_de_accion",
+    "column_name": "id_tipo_de_accion",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "tipos_de_accion",
+    "column_name": "tipo_de_accion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "tipos_de_accion",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "tipos_de_compra",
+    "column_name": "id_tipo_de_compra",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "tipos_de_compra",
+    "column_name": "tipo_de_compra",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "tipos_de_compra",
+    "column_name": "oficialia",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "tipos_de_compra",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "tipos_de_compra_om",
+    "column_name": "id_tipo_de_compra_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "tipos_de_compra_om",
+    "column_name": "tipo_de_compra",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "tipos_de_compra_om",
+    "column_name": "oficialia",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "tipos_de_compra_om",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "tipos_de_gasto",
+    "column_name": "id_tipo_de_gasto",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "tipos_de_gasto",
+    "column_name": "clave_tipo_de_gasto",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "tipos_de_gasto",
+    "column_name": "descripcion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "tipos_de_gasto",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "tipos_de_proyecto",
+    "column_name": "id_tipo_de_proyecto",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "tipos_de_proyecto",
+    "column_name": "tipo_de_proyecto",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "tipos_de_proyecto",
+    "column_name": "abreviatura",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "tipos_de_proyecto",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "tipos_de_recurso",
+    "column_name": "id_tipo_de_recurso",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "tipos_de_recurso",
+    "column_name": "clave_tipo_de_recurso",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "tipos_de_recurso",
+    "column_name": "descripcion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "tipos_de_recurso",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "tipos_de_vehiculos",
+    "column_name": "id_tipo_de_vehiculo",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "tipos_de_vehiculos",
+    "column_name": "tipo_de_vehiculo",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "tipos_de_vehiculos",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "unidades",
+    "column_name": "id_unidad",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "unidades",
+    "column_name": "unidad",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "unidades",
+    "column_name": "abreviatura",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "unidades",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "usos_del_vehiculo",
+    "column_name": "id_uso_del_vehiculo",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "usos_del_vehiculo",
+    "column_name": "uso_del_vehiculo",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "usos_del_vehiculo",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "usuarios",
+    "column_name": "id_usuario",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "usuarios",
+    "column_name": "id_rol",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "usuarios",
+    "column_name": "nombres",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "usuarios",
+    "column_name": "apellidos",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "usuarios",
+    "column_name": "correo",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "usuarios",
+    "column_name": "usuario",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "usuarios",
+    "column_name": "contraseña",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "usuarios",
+    "column_name": "foto",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "usuarios",
+    "column_name": "id_empleado",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "usuarios",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "vales_de_entrada",
+    "column_name": "id_vale_de_entrada",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada",
+    "column_name": "id_requisicion_de_entrada",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada",
+    "column_name": "fecha_de_entrada",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "CURRENT_TIMESTAMP"
+  },
+  {
+    "table_name": "vales_de_entrada",
+    "column_name": "fecha_de_emision_factura",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada",
+    "column_name": "numero_de_factura",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada",
+    "column_name": "id_tipo_de_compra",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada",
+    "column_name": "id_proveedor",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada",
+    "column_name": "id_partida",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada",
+    "column_name": "es_oficialia",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "vales_de_entrada",
+    "column_name": "subtotal",
+    "data_type": "numeric",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_name": "vales_de_entrada",
+    "column_name": "iva",
+    "data_type": "numeric",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_name": "vales_de_entrada",
+    "column_name": "total",
+    "data_type": "numeric",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_name": "vales_de_entrada",
+    "column_name": "observaciones",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada",
+    "column_name": "id_repartidor",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada",
+    "column_name": "id_empleado",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada",
+    "column_name": "id_estatus_de_captura",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada",
+    "column_name": "esta_concluida",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "vales_de_entrada",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "vales_de_entrada",
+    "column_name": "fecha_de_creacion",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "CURRENT_TIMESTAMP"
+  },
+  {
+    "table_name": "vales_de_entrada_archivos",
+    "column_name": "id_vale_de_entrada_archivos",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_archivos",
+    "column_name": "url",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_archivos",
+    "column_name": "id_vale_de_entrada",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_archivos",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "vales_de_entrada_archivos_om",
+    "column_name": "id_vale_de_entrada_archivos_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_archivos_om",
+    "column_name": "url",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_archivos_om",
+    "column_name": "id_vale_de_entrada_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_archivos_om",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "vales_de_entrada_detalle",
+    "column_name": "id_vale_de_entrada_detalle",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_detalle",
+    "column_name": "id_vale_de_entrada",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_detalle",
+    "column_name": "id_producto",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_detalle",
+    "column_name": "cantidad",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_detalle",
+    "column_name": "id_unidad",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_detalle",
+    "column_name": "precio_unitario",
+    "data_type": "numeric",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_detalle",
+    "column_name": "importe",
+    "data_type": "numeric",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_detalle",
+    "column_name": "nota",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_detalle",
+    "column_name": "fecha_de_caducidad",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_detalle",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "vales_de_entrada_detalle_om",
+    "column_name": "id_vale_de_entrada_detalle_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_detalle_om",
+    "column_name": "id_vale_de_entrada_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_detalle_om",
+    "column_name": "id_producto_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_detalle_om",
+    "column_name": "cantidad",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_detalle_om",
+    "column_name": "id_unidad",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_detalle_om",
+    "column_name": "precio_unitario",
+    "data_type": "numeric",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_detalle_om",
+    "column_name": "importe",
+    "data_type": "numeric",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_detalle_om",
+    "column_name": "nota",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_detalle_om",
+    "column_name": "fecha_de_caducidad",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_detalle_om",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "vales_de_entrada_om",
+    "column_name": "id_vale_de_entrada_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_om",
+    "column_name": "id_requisicion_de_entrada_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_om",
+    "column_name": "fecha_de_creacion",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "CURRENT_TIMESTAMP"
+  },
+  {
+    "table_name": "vales_de_entrada_om",
+    "column_name": "fecha_de_entrada",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "CURRENT_TIMESTAMP"
+  },
+  {
+    "table_name": "vales_de_entrada_om",
+    "column_name": "fecha_de_emision_factura",
+    "data_type": "timestamp without time zone",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_om",
+    "column_name": "numero_de_factura",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_om",
+    "column_name": "id_tipo_de_compra_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_om",
+    "column_name": "id_proveedor_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_om",
+    "column_name": "id_partida",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_om",
+    "column_name": "es_oficialia",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "vales_de_entrada_om",
+    "column_name": "subtotal",
+    "data_type": "numeric",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_name": "vales_de_entrada_om",
+    "column_name": "iva",
+    "data_type": "numeric",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_name": "vales_de_entrada_om",
+    "column_name": "total",
+    "data_type": "numeric",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "0"
+  },
+  {
+    "table_name": "vales_de_entrada_om",
+    "column_name": "observaciones",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_om",
+    "column_name": "id_repartidor_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_om",
+    "column_name": "id_empleado",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_om",
+    "column_name": "id_estatus_de_captura",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_entrada_om",
+    "column_name": "esta_concluida",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "vales_de_entrada_om",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "vales_de_salida",
+    "column_name": "id_vale_de_salida",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida",
+    "column_name": "id_requisicion_de_salida",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida",
+    "column_name": "numero_de_factura",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida",
+    "column_name": "fecha_de_salida",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "CURRENT_TIMESTAMP"
+  },
+  {
+    "table_name": "vales_de_salida",
+    "column_name": "id_proveedor",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida",
+    "column_name": "id_area",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida",
+    "column_name": "id_empleado_entrega",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida",
+    "column_name": "id_empleado_recibe",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida",
+    "column_name": "observaciones",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida",
+    "column_name": "id_estatus_de_captura",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida",
+    "column_name": "es_oficialia",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "vales_de_salida",
+    "column_name": "esta_concluida",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "vales_de_salida",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "vales_de_salida",
+    "column_name": "merma_autorizada",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida",
+    "column_name": "merma_autorizada_por",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida",
+    "column_name": "merma_fecha_autorizacion",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida",
+    "column_name": "merma_comentario_autorizacion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida",
+    "column_name": "id_empleado_externo",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida",
+    "column_name": "fecha_de_creacion_salida",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "CURRENT_TIMESTAMP"
+  },
+  {
+    "table_name": "vales_de_salida_detalle",
+    "column_name": "id_vale_de_salida_detalle",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida_detalle",
+    "column_name": "id_vale_de_salida",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida_detalle",
+    "column_name": "id_producto",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida_detalle",
+    "column_name": "cantidad",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida_detalle",
+    "column_name": "id_unidad",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida_detalle",
+    "column_name": "es_merma",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "vales_de_salida_detalle",
+    "column_name": "nota",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida_detalle",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "vales_de_salida_detalle",
+    "column_name": "stock_actual",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": "0"
+  },
+  {
+    "table_name": "vales_de_salida_detalle",
+    "column_name": "stock_negativo",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": "false"
+  },
+  {
+    "table_name": "vales_de_salida_detalle",
+    "column_name": "stock_resultante",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": "0"
+  },
+  {
+    "table_name": "vales_de_salida_detalle_om",
+    "column_name": "id_vale_de_salida_detalle_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida_detalle_om",
+    "column_name": "id_vale_de_salida_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida_detalle_om",
+    "column_name": "id_producto_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida_detalle_om",
+    "column_name": "cantidad",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida_detalle_om",
+    "column_name": "id_unidad",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida_detalle_om",
+    "column_name": "es_merma",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "vales_de_salida_detalle_om",
+    "column_name": "nota",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida_detalle_om",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "vales_de_salida_detalle_om",
+    "column_name": "stock_actual",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": "0"
+  },
+  {
+    "table_name": "vales_de_salida_detalle_om",
+    "column_name": "stock_negativo",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": "false"
+  },
+  {
+    "table_name": "vales_de_salida_detalle_om",
+    "column_name": "stock_resultante",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": "0"
+  },
+  {
+    "table_name": "vales_de_salida_om",
+    "column_name": "id_vale_de_salida_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida_om",
+    "column_name": "id_requisicion_de_salida_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida_om",
+    "column_name": "fecha_de_creacion_salida",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "CURRENT_TIMESTAMP"
+  },
+  {
+    "table_name": "vales_de_salida_om",
+    "column_name": "numero_de_factura",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida_om",
+    "column_name": "fecha_de_salida",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "CURRENT_TIMESTAMP"
+  },
+  {
+    "table_name": "vales_de_salida_om",
+    "column_name": "id_proveedor_om",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida_om",
+    "column_name": "id_area",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida_om",
+    "column_name": "id_empleado_entrega",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida_om",
+    "column_name": "id_empleado_recibe",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida_om",
+    "column_name": "id_empleado_externo",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida_om",
+    "column_name": "observaciones",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida_om",
+    "column_name": "id_estatus_de_captura",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida_om",
+    "column_name": "es_oficialia",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "vales_de_salida_om",
+    "column_name": "esta_concluida",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "vales_de_salida_om",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "vales_de_salida_om",
+    "column_name": "merma_autorizada",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida_om",
+    "column_name": "merma_autorizada_por",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida_om",
+    "column_name": "merma_fecha_autorizacion",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vales_de_salida_om",
+    "column_name": "merma_comentario_autorizacion",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vehiculos",
+    "column_name": "id_vehiculo",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vehiculos",
+    "column_name": "id_estructura_administrativa",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vehiculos",
+    "column_name": "numero_economico",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vehiculos",
+    "column_name": "id_marca_de_vehiculo",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vehiculos",
+    "column_name": "id_tipo_de_vehiculo",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vehiculos",
+    "column_name": "id_clase_de_vehiculo",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vehiculos",
+    "column_name": "modelo",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vehiculos",
+    "column_name": "placas_anteriores",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vehiculos",
+    "column_name": "placas_actuales",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vehiculos",
+    "column_name": "numero_de_motor",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vehiculos",
+    "column_name": "serie",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vehiculos",
+    "column_name": "id_estatus_de_vehiculo",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vehiculos",
+    "column_name": "id_uso_del_vehiculo",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "vehiculos",
+    "column_name": "id_empleado",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vehiculos",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "table_name": "vw_claves_presupuestarias",
+    "column_name": "id_clave_presupuestaria",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vw_claves_presupuestarias",
+    "column_name": "clave_pptal",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vw_claves_presupuestarias",
+    "column_name": "clave_pt",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vw_claves_presupuestarias",
+    "column_name": "aprobado",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vw_claves_presupuestarias",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vw_proyectos_estrategicos",
+    "column_name": "id_proyecto_estrategico",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vw_proyectos_estrategicos",
+    "column_name": "clave_pt",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vw_proyectos_estrategicos",
+    "column_name": "nombre_tecnico",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vw_proyectos_estrategicos",
+    "column_name": "proyecto_estrategico",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vw_proyectos_estrategicos",
+    "column_name": "id_año_del_gasto",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vw_proyectos_estrategicos",
+    "column_name": "id_asignacion_del_gasto",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vw_proyectos_estrategicos",
+    "column_name": "id_estructura_administrativa",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vw_proyectos_estrategicos",
+    "column_name": "id_clasificacion_funcional",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vw_proyectos_estrategicos",
+    "column_name": "id_programa_sectorial",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vw_proyectos_estrategicos",
+    "column_name": "id_programa_presupuestario",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vw_proyectos_estrategicos",
+    "column_name": "id_origen_de_asignacion",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vw_proyectos_estrategicos",
+    "column_name": "id_actividad_institucional",
+    "data_type": "integer",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "vw_proyectos_estrategicos",
+    "column_name": "esta_borrado",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  }
+]

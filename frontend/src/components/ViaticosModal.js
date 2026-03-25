@@ -32,8 +32,9 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
     const [firmasFijasDisponibles, setFirmasFijasDisponibles] = useState([]);  // Nuevo estado
     const [detalles, setDetalles] = useState([]);
     const [fechaActividad, setFechaActividad] = useState(null);  // Fecha de la actividad del memorandum
+    const [periodoMemo, setPeriodoMemo] = useState({ inicio: null, fin: null }); // Rango del memorandum
     const [gastosGlobales, setGastosGlobales] = useState(null);
-    const [deleteConfirm, setDeleteConfirm] = useState({ open: false, id: null }); // Estado para confirmación themed
+    const [deleteConfirm, setDeleteConfirm] = useState({ open: false, id: null, type: null }); // type: 'detalle' o 'global'
 
     const [formData, setFormData] = useState({
         id_municipio: '',
@@ -56,26 +57,60 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
     const [actionLoading, setActionLoading] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
-    // Función para validar si la fecha de inicio es válida (debe ser DESPUÉS de la fecha de actividad)
-    const esFechaInicioValida = (fechaInicio) => {
-        if (!fechaActividad || !fechaInicio) return true;
+    const formatDateSafe = (dateStr) => {
+        if (!dateStr) return '';
+        const [year, month, day] = dateStr.split('-');
+        return `${day}/${month}/${year}`;
+    };
 
-        const fechaAct = new Date(fechaActividad);
+    // Función para validar si la fecha de inicio es válida
+    const esFechaInicioValida = (fechaInicio) => {
+        if (!fechaInicio) return { valida: true };
+
         const fechaIni = new Date(fechaInicio);
 
-        // La fecha de inicio debe ser MAYOR (no igual) a la fecha de actividad
-        return fechaIni > fechaAct;
+        // 1. Debe ser después de la actividad
+        if (fechaActividad) {
+            const fAct = fechaActividad.split('T')[0];
+            if (fechaInicio <= fAct) return { valida: false, msg: `Debe ser después de la actividad (${formatDateSafe(fAct)})` };
+        }
+
+        // 2. Debe estar dentro del rango del memorandum
+        if (periodoMemo.inicio && periodoMemo.fin) {
+            if (fechaInicio < periodoMemo.inicio || fechaInicio > periodoMemo.fin) {
+                return { valida: false, msg: `Fuera del rango del memo (${formatDateSafe(periodoMemo.inicio)} - ${formatDateSafe(periodoMemo.fin)})` };
+            }
+        }
+
+        return { valida: true };
     };
 
     // Función para validar si la fecha de fin es válida
     const esFechaFinValida = (fechaFin) => {
-        if (!fechaActividad || !fechaFin) return true;
+        if (!fechaFin) return { valida: true };
 
-        const fechaAct = new Date(fechaActividad);
         const fechaF = new Date(fechaFin);
 
-        // La fecha de fin también debe ser MAYOR (no igual) a la fecha de actividad
-        return fechaF > fechaAct;
+        // 1. Debe ser después de la actividad
+        if (fechaActividad) {
+            const fAct = fechaActividad.split('T')[0];
+            if (fechaFin <= fAct) return { valida: false, msg: `Debe ser después de la actividad (${formatDateSafe(fAct)})` };
+        }
+
+        // 2. Debe estar dentro del rango del memorandum
+        if (periodoMemo.inicio && periodoMemo.fin) {
+            if (fechaFin < periodoMemo.inicio || fechaFin > periodoMemo.fin) {
+                return { valida: false, msg: `Fuera del rango del memo (${formatDateSafe(periodoMemo.inicio)} - ${formatDateSafe(periodoMemo.fin)})` };
+            }
+        }
+
+        // 3. Debe ser después del inicio (si existe inicio)
+        if (formData.fecha_inicio) {
+            const fechaIni = new Date(formData.fecha_inicio);
+            if (fechaF < fechaIni) return { valida: false, msg: 'No puede ser anterior al inicio' };
+        }
+
+        return { valida: true };
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -100,7 +135,7 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
         if (formData.id_municipio && idEmpleado) {
             calcularTarifa();
         }
-    }, [formData.id_municipio, formData.pernocta]);
+    }, [formData.id_municipio, formData.pernocta, formData.fecha_inicio]);
 
     const cargarCatalogos = async () => {
         try {
@@ -122,9 +157,15 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
                 const firmasFijas = resFirmaFija.data.firmas;
                 setFirmasFijasDisponibles(firmasFijas);
 
-                // Guardar fecha de actividad para validación
+                // Guardar fecha de actividad y periodo para validación
                 if (resMemoFirma.data.firma.fecha_actividad) {
                     setFechaActividad(resMemoFirma.data.firma.fecha_actividad);
+                }
+                if (resMemoFirma.data.firma.periodo_inicio) {
+                    setPeriodoMemo({
+                        inicio: resMemoFirma.data.firma.periodo_inicio.split('T')[0],
+                        fin: resMemoFirma.data.firma.periodo_fin.split('T')[0]
+                    });
                 }
 
                 // Si solo hay una firma fija, auto-seleccionarla
@@ -180,7 +221,8 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
             const res = await axios.post(`${API_BASE_URL}/api/viaticos/calcular`, {
                 id_empleado: idEmpleado,
                 id_municipio: formData.id_municipio,
-                pernocta: formData.pernocta
+                pernocta: formData.pernocta,
+                fecha_inicio: formData.fecha_inicio
             }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -306,6 +348,14 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
             return;
         }
 
+        const resInicio = esFechaInicioValida(formData.fecha_inicio);
+        const resFin = esFechaFinValida(formData.fecha_fin);
+
+        if (!resInicio.valida || !resFin.valida) {
+            setSnackbar({ open: true, message: resInicio.msg || resFin.msg || 'Fechas inválidas', severity: 'error' });
+            return;
+        }
+
         // Validación final de pernocta
         if (formData.pernocta) {
             if (formData.fecha_inicio === formData.fecha_fin) {
@@ -427,25 +477,50 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
     };
 
     const eliminarDetalle = (id) => {
-        setDeleteConfirm({ open: true, id });
+        setDeleteConfirm({ open: true, id, type: 'detalle' });
+    };
+
+    const eliminarGastosGlobales = () => {
+        if (!gastosGlobales) return;
+        setDeleteConfirm({ open: true, id: gastosGlobales.id_gasto_global, type: 'global' });
     };
 
     const handleConfirmDelete = async () => {
-        const id = deleteConfirm.id;
+        const { id, type } = deleteConfirm;
         setActionLoading(true);
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`${API_BASE_URL}/api/viaticos/${id}`, {
+            const url = type === 'global'
+                ? `${API_BASE_URL}/api/gastos-globales/${id}`
+                : `${API_BASE_URL}/api/viaticos/${id}`;
+
+            await axios.delete(url, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setSnackbar({ open: true, message: 'Registro eliminado correctamente', severity: 'success' });
+
+            setSnackbar({
+                open: true,
+                message: type === 'global' ? 'Gastos globales eliminados' : 'Registro eliminado correctamente',
+                severity: 'success'
+            });
+
+            if (type === 'global') {
+                // Limpiar campos de gastos en el form
+                setFormData(prev => ({
+                    ...prev,
+                    pasaje: 0,
+                    combustible: 0,
+                    otros: 0
+                }));
+            }
+
             cargarDetalles();
         } catch (error) {
             console.error(error);
             setSnackbar({ open: true, message: 'Error al eliminar el registro', severity: 'error' });
         } finally {
             setActionLoading(false);
-            setDeleteConfirm({ open: false, id: null });
+            setDeleteConfirm({ open: false, id: null, type: null });
         }
     };
     const inputStyles = {
@@ -538,16 +613,36 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
                         border: '1px solid #334155',
                         boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
                     }}>
-                        <Typography variant="subtitle1" sx={{
-                            color: '#38bdf8',
-                            fontWeight: 800,
-                            mb: 2.5,
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 1
-                        }}>
-                            <MoneyIcon sx={{ fontSize: 20 }} /> Gastos Globales
-                        </Typography>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2.5 }}>
+                            <Typography variant="subtitle1" sx={{
+                                color: '#38bdf8',
+                                fontWeight: 800,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1
+                            }}>
+                                <MoneyIcon sx={{ fontSize: 20 }} /> Gastos Globales
+                            </Typography>
+                            {gastosGlobales && (
+                                <Tooltip title="Eliminar Gastos Globales">
+                                    <IconButton
+                                        size="small"
+                                        onClick={eliminarGastosGlobales}
+                                        sx={{
+                                            color: '#ef4444',
+                                            bgcolor: 'rgba(239, 68, 68, 0.1)',
+                                            width: 32,
+                                            height: 32,
+                                            borderRadius: '8px',
+                                            '&:hover': { bgcolor: 'rgba(239, 68, 68, 0.2)' },
+                                            transition: 'all 0.2s'
+                                        }}
+                                    >
+                                        <DeleteIcon sx={{ fontSize: 18 }} />
+                                    </IconButton>
+                                </Tooltip>
+                            )}
+                        </Box>
 
                         <Grid container spacing={2}>
                             <Grid item xs={12} sm={3}>
@@ -765,8 +860,8 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
                                         fullWidth
                                         size="small"
                                         InputLabelProps={{ shrink: true }}
-                                        error={!esFechaInicioValida(formData.fecha_inicio) && !!formData.fecha_inicio}
-                                        helperText={!esFechaInicioValida(formData.fecha_inicio) && !!formData.fecha_inicio ? `Debe ser después del ${new Date(fechaActividad).toLocaleDateString()}` : ''}
+                                        error={!esFechaInicioValida(formData.fecha_inicio).valida && !!formData.fecha_inicio}
+                                        helperText={esFechaInicioValida(formData.fecha_inicio).msg}
                                         sx={inputStyles}
                                     />
                                 </Grid>
@@ -781,8 +876,8 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
                                         fullWidth
                                         size="small"
                                         InputLabelProps={{ shrink: true }}
-                                        error={!esFechaFinValida(formData.fecha_fin) && !!formData.fecha_fin}
-                                        helperText={!esFechaFinValida(formData.fecha_fin) && !!formData.fecha_fin ? `Debe ser después del ${new Date(fechaActividad).toLocaleDateString()}` : ''}
+                                        error={!esFechaFinValida(formData.fecha_fin).valida && !!formData.fecha_fin}
+                                        helperText={esFechaFinValida(formData.fecha_fin).msg}
                                         sx={inputStyles}
                                     />
                                 </Grid>
@@ -1048,7 +1143,7 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
             {/* DIÁLOGO DE CONFIRMACIÓN PARA ELIMINAR */}
             <Dialog
                 open={deleteConfirm.open}
-                onClose={() => setDeleteConfirm({ open: false, id: null })}
+                onClose={() => setDeleteConfirm({ open: false, id: null, type: null })}
                 PaperProps={{
                     sx: {
                         bgcolor: '#1e293b',
@@ -1070,7 +1165,7 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
                 </DialogContent>
                 <DialogActions sx={{ p: 2.5, gap: 1 }}>
                     <Button
-                        onClick={() => setDeleteConfirm({ open: false, id: null })}
+                        onClick={() => setDeleteConfirm({ open: false, id: null, type: null })}
                         sx={{ color: '#64748b', fontWeight: 700, textTransform: 'none' }}
                     >
                         Cancelar

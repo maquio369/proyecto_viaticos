@@ -1,0 +1,84 @@
+{
+  "missingTablesInProd": [
+    "actividades",
+    "backup_cargos_manual",
+    "backup_empleados",
+    "backup_empleados_manual",
+    "cat_bancos",
+    "categorias",
+    "categorias_del_empleado",
+    "comisiones",
+    "cuentas_bancarias",
+    "detalles_viaticos",
+    "empleados_original",
+    "estados_federacion",
+    "firmas",
+    "firmas_adicionales_empleado",
+    "firmas_por_area",
+    "gastos_globales_memorandum",
+    "memorandum_comision",
+    "producto_estatus",
+    "productos_no_registrados",
+    "puestos_anterior_sistema",
+    "requisicion_entrada",
+    "requisiciones",
+    "tarifas_viaticos",
+    "tramite_comisiones",
+    "tramites",
+    "zonas_municipios",
+    "zonas_viaticos"
+  ],
+  "missingTablesInLocal": [
+    "cargos",
+    "empleados_externos",
+    "facturas_concluidas_om",
+    "productos_genericos_om",
+    "productos_om",
+    "proveedores_om",
+    "repartidores_om",
+    "requisiciones_de_entrada_om",
+    "requisiciones_de_salida_om",
+    "tipos_de_compra_om",
+    "vales_de_entrada_archivos_om",
+    "vales_de_entrada_detalle_om",
+    "vales_de_entrada_om",
+    "vales_de_salida_detalle_om",
+    "vales_de_salida_om"
+  ],
+  "missingCols": {
+    "areas": {
+      "missingInProd": [
+        "oficio"
+      ],
+      "missingInLocal": [
+        "abreviatura"
+      ]
+    },
+    "empleados": {
+      "missingInProd": [
+        "id_lugar_fisico_de_trabajo"
+      ],
+      "missingInLocal": [
+        "id_cargo"
+      ]
+    },
+    "empleados_datos_laborales": {
+      "missingInProd": [
+        "id_categoria_del_empleado"
+      ],
+      "missingInLocal": []
+    },
+    "puestos": {
+      "missingInProd": [
+        "id_puesto",
+        "nombre_puesto",
+        "esta_borrado"
+      ],
+      "missingInLocal": [
+        "puesto_id",
+        "puesto",
+        "esta_activo"
+      ]
+    }
+  }
+}

@@ -12,18 +12,22 @@ router.use((req, res, next) => {
 // CALCULAR TARIFA
 router.post('/calcular', auth, async (req, res) => {
     try {
-        const { id_empleado, id_municipio, pernocta } = req.body;
+        const { id_empleado, id_municipio, pernocta, fecha_inicio } = req.body;
 
         if (!id_empleado || !id_municipio) {
             return res.status(400).json({ success: false, message: 'Faltan datos requeridos (empleado, municipio)' });
         }
 
-        // 1. Obtener Nivel del Empleado (usando columna 'literal')
+        // 1. Obtener Nivel del Empleado evaluando el historial si hay fecha_inicio
         const empQuery = `
-            SELECT cat.literal_viatico as nivel
+            SELECT 
+                cat.literal_viatico as nivel_actual,
+                cat_ant.literal_viatico as nivel_anterior,
+                edl.fecha_actualizacion_categoria
             FROM empleados e
             JOIN empleados_datos_laborales edl ON e.id_empleado_datos_laborales = edl.id_empleado_datos_laborales
-            JOIN categorias_del_empleado cat ON edl.id_categoria_del_empleado = cat.id_categoria_del_empleado
+            LEFT JOIN categorias_del_empleado cat ON edl.id_categoria_del_empleado = cat.id_categoria_del_empleado
+            LEFT JOIN categorias_del_empleado cat_ant ON edl.id_categoria_anterior = cat_ant.id_categoria_del_empleado
             WHERE e.id_empleado = $1
         `;
 
@@ -31,10 +35,24 @@ router.post('/calcular', auth, async (req, res) => {
         const empRes = await pool.query(empQuery, [id_empleado]);
 
         if (empRes.rows.length === 0) {
-            return res.json({ success: false, message: 'No se encontró nivel (literal) para el empleado. Verifique que tenga datos laborales asignados.' });
+            return res.json({ success: false, message: 'No se encontró información laboral para el empleado.' });
         }
 
-        const nivel = empRes.rows[0].nivel;
+        const datosEmp = empRes.rows[0];
+        let nivel = datosEmp.nivel_actual;
+        let uso_historial = false;
+
+        // Evaluar si aplica la categoría histórica (la fecha del viaje es anterior a la fecha de actualización)
+        if (fecha_inicio && datosEmp.fecha_actualizacion_categoria && datosEmp.nivel_anterior) {
+            const fechaViaje = new Date(fecha_inicio);
+            const fechaActualizacion = new Date(datosEmp.fecha_actualizacion_categoria);
+            
+            if (fechaViaje < fechaActualizacion) {
+                nivel = datosEmp.nivel_anterior;
+                uso_historial = true;
+                console.log(`Aplicando tarifa retroactiva: Viaje(${fechaViaje.toISOString().split('T')[0]}) < Actualizacion(${fechaActualizacion.toISOString().split('T')[0]}). Nivel usado: ${nivel}`);
+            }
+        }
 
         // 2. Obtener Zona del Municipio
         const zonaQuery = `
@@ -71,7 +89,7 @@ router.post('/calcular', auth, async (req, res) => {
         res.json({
             success: true,
             tarifa: tarifa,
-            debug: { nivel, id_zona, tipo_dia }
+            debug: { nivel, id_zona, tipo_dia, uso_historial }
         });
 
     } catch (error) {

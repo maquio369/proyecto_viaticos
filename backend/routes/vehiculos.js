@@ -10,7 +10,7 @@ const router = express.Router();
 // Obtener usos de vehículos
 router.get('/usos', auth, async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM usos_de_vehiculos WHERE esta_borrado = false ORDER BY usos_de_vehiculo');
+        const result = await pool.query('SELECT * FROM usos_del_vehiculo WHERE esta_borrado = false ORDER BY uso_del_vehiculo');
         res.json(result.rows);
     } catch (error) {
         console.error('Error al obtener usos:', error);
@@ -32,7 +32,7 @@ router.get('/estatus', auth, async (req, res) => {
 // Obtener clases de vehículos
 router.get('/clases', auth, async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM clases_de_vehiculos WHERE esta_borrado = false ORDER BY clases_de_vehiculo');
+        const result = await pool.query('SELECT * FROM clases_de_vehiculos WHERE esta_borrado = false ORDER BY clase_de_vehiculo');
         res.json(result.rows);
     } catch (error) {
         console.error('Error al obtener clases:', error);
@@ -43,7 +43,7 @@ router.get('/clases', auth, async (req, res) => {
 // Obtener tipos de vehículos
 router.get('/tipos', auth, async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM tipos_de_vehiculos WHERE esta_borrado = false ORDER BY tipos_de_vehiculo');
+        const result = await pool.query('SELECT * FROM tipos_de_vehiculos WHERE esta_borrado = false ORDER BY tipo_de_vehiculo');
         res.json(result.rows);
     } catch (error) {
         console.error('Error al obtener tipos:', error);
@@ -54,9 +54,7 @@ router.get('/tipos', auth, async (req, res) => {
 // Obtener marcas de vehículos
 router.get('/marcas', auth, async (req, res) => {
     try {
-        console.log('Fetching marcas...');
         const result = await pool.query('SELECT * FROM marcas_de_vehiculos WHERE esta_borrado = false ORDER BY id_marca_de_vehiculo ASC');
-        console.log(`Found ${result.rows.length} marcas`);
         res.json(result.rows);
     } catch (error) {
         console.error('Error al obtener marcas:', error);
@@ -83,9 +81,8 @@ router.post('/', auth, async (req, res) => {
             numero_de_motor,
             serie,
             id_estatus_de_vehiculo,
-            id_usos_de_vehiculo,
-            id_empleado,
-            observaciones
+            id_uso_del_vehiculo,
+            id_empleado
         } = req.body;
 
         const query = `
@@ -101,14 +98,14 @@ router.post('/', auth, async (req, res) => {
         numero_de_motor,
         serie,
         id_estatus_de_vehiculo,
-        id_usos_de_vehiculo,
+        id_uso_del_vehiculo,
         id_empleado
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
       RETURNING id_vehiculo
     `;
 
         const values = [
-            id_estructura_administrativa || 1, // Default to 1 if not provided? Adjust based on requirements
+            id_estructura_administrativa || 1,
             numero_economico,
             id_marca_de_vehiculo,
             id_tipo_de_vehiculo,
@@ -119,7 +116,7 @@ router.post('/', auth, async (req, res) => {
             numero_de_motor,
             serie,
             id_estatus_de_vehiculo,
-            id_usos_de_vehiculo,
+            id_uso_del_vehiculo,
             id_empleado
         ];
 
@@ -136,7 +133,7 @@ router.post('/', auth, async (req, res) => {
     }
 });
 
-// Listar vehículos (Búsqueda básica)
+// Listar vehículos
 router.get('/', auth, async (req, res) => {
     try {
         const { q } = req.query;
@@ -147,7 +144,7 @@ router.get('/', auth, async (req, res) => {
         v.id_marca_de_vehiculo,
         m.marca_de_vehiculo,
         v.id_tipo_de_vehiculo,
-        t.tipos_de_vehiculo,
+        t.tipo_de_vehiculo,
         v.id_clase_de_vehiculo,
         v.modelo,
         v.placas_anteriores,
@@ -155,14 +152,14 @@ router.get('/', auth, async (req, res) => {
         v.numero_de_motor,
         v.serie,
         v.id_estatus_de_vehiculo,
-        v.id_usos_de_vehiculo,
-        u.usos_de_vehiculo as uso,
+        v.id_uso_del_vehiculo,
+        u.uso_del_vehiculo as uso,
         v.id_empleado,
         e.nombres || ' ' || e.apellido1 as resguardatario
       FROM vehiculos v
       LEFT JOIN marcas_de_vehiculos m ON v.id_marca_de_vehiculo = m.id_marca_de_vehiculo
-      LEFT JOIN tipos_de_vehiculos t ON v.id_tipo_de_vehiculo = t.id_tipos_de_vehiculo
-      LEFT JOIN usos_de_vehiculos u ON v.id_usos_de_vehiculo = u.id_usos_de_vehiculo
+      LEFT JOIN tipos_de_vehiculos t ON v.id_tipo_de_vehiculo = t.id_tipo_de_vehiculo
+      LEFT JOIN usos_del_vehiculo u ON v.id_uso_del_vehiculo = u.id_uso_del_vehiculo
       LEFT JOIN empleados e ON v.id_empleado = e.id_empleado
       WHERE v.esta_borrado = false
     `;
@@ -205,7 +202,7 @@ router.put('/:id', auth, async (req, res) => {
             numero_de_motor,
             serie,
             id_estatus_de_vehiculo,
-            id_usos_de_vehiculo,
+            id_uso_del_vehiculo,
             id_empleado
         } = req.body;
 
@@ -222,7 +219,7 @@ router.put('/:id', auth, async (req, res) => {
         numero_de_motor = $9,
         serie = $10,
         id_estatus_de_vehiculo = $11,
-        id_usos_de_vehiculo = $12,
+        id_uso_del_vehiculo = $12,
         id_empleado = $13
       WHERE id_vehiculo = $14
       RETURNING id_vehiculo
@@ -240,7 +237,7 @@ router.put('/:id', auth, async (req, res) => {
             numero_de_motor,
             serie,
             id_estatus_de_vehiculo,
-            id_usos_de_vehiculo,
+            id_uso_del_vehiculo,
             id_empleado,
             id
         ];
@@ -254,7 +251,7 @@ router.put('/:id', auth, async (req, res) => {
     }
 });
 
-// Eliminar (lógicamente) vehículo
+// Eliminar vehículo
 router.delete('/:id', auth, async (req, res) => {
     try {
         const { id } = req.params;

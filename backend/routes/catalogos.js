@@ -44,10 +44,14 @@ router.get('/empleados', async (req, res) => {
     const result = await pool.query(
       `SELECT e.id_empleado, e.nombres, e.apellido1, e.apellido2, 
               e.id_area, a.descripcion as area_nombre,
-              e.id_lugar_fisico_de_trabajo, lft.descripcion as lugar_trabajo_nombre
+              e.id_lugar_fisico_de_trabajo, lft.descripcion as lugar_trabajo_nombre,
+              p.nombre_puesto as cargo
        FROM empleados e 
        LEFT JOIN areas a ON e.id_area = a.id_area
        LEFT JOIN areas lft ON e.id_lugar_fisico_de_trabajo = lft.id_area
+       LEFT JOIN empleados_datos_laborales edl ON e.id_empleado_datos_laborales = edl.id_empleado_datos_laborales
+       LEFT JOIN categorias_del_empleado cde ON edl.id_categoria_del_empleado = cde.id_categoria_del_empleado
+       LEFT JOIN puestos p ON cde.id_puesto = p.id_puesto
        WHERE e.esta_borrado = false 
        ORDER BY e.nombres, e.apellido1`
     );
@@ -139,6 +143,24 @@ router.get('/firma-fija', async (req, res) => {
     });
   } catch (error) {
     console.error('Error obteniendo firma fija:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Obtener áreas
+router.get('/areas', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT id_area, descripcion FROM areas WHERE esta_borrado = false ORDER BY descripcion'
+    );
+    res.json({
+      success: true,
+      areas: result.rows
+    });
+  } catch (error) {
     res.status(500).json({
       success: false,
       error: error.message

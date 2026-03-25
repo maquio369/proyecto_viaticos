@@ -108,6 +108,19 @@ router.delete('/:id', auth, async (req, res) => {
     const { id } = req.params;
     const id_usuario = req.user.id;
 
+    // Verificar si la actividad ya tiene un memorandum generado (no borrado)
+    const checkMemo = await pool.query(
+      'SELECT id_memorandum_comision FROM memorandum_comision WHERE id_actividad = $1 AND esta_borrado = false',
+      [id]
+    );
+
+    if (checkMemo.rows.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No se puede eliminar la actividad porque ya tiene un memorandum generado.'
+      });
+    }
+
     const result = await pool.query(
       `UPDATE actividades SET esta_borrado = true 
        WHERE id_actividad = $1 AND id_usuario = $2

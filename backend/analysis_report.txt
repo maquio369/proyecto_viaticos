@@ -1,0 +1,371 @@
+=== Análisis detallado de tablas relacionadas con Empleados ===
+
+
+==================================================
+TABLA: empleados
+==================================================
+
+Columnas:
+  - id_empleado               | integer              | Null: NO  | Def: None
+  - prefijo                   | text                 | Null: YES | Def: None
+  - nombres                   | text                 | Null: YES | Def: None
+  - apellido1                 | text                 | Null: YES | Def: None
+  - apellido2                 | text                 | Null: YES | Def: None
+  - id_cargo                  | integer              | Null: YES | Def: None
+  - correo                    | text                 | Null: YES | Def: None
+  - telefonos_oficina         | text                 | Null: YES | Def: None
+  - id_area                   | integer              | Null: YES | Def: None
+  - id_lugar_fisico_de_trabajo | integer              | Null: YES | Def: None
+  - id_empleado_datos_laborales | integer              | Null: YES | Def: None
+  - fecha_ingreso             | timestamp with time zone | Null: YES | Def: None
+  - fecha_baja                | timestamp with time zone | Null: YES | Def: None
+  - esta_borrado              | boolean              | Null: YES | Def: None
+
+Primary Key: id_empleado
+
+Relaciones (FK):
+  - id_empleado -> empleados.id_empleado
+  - id_area -> areas.id_area
+  - id_cargo -> cargos.id_cargo
+  - id_empleado_datos_laborales -> empleados_datos_laborales.id_empleado_datos_laborales
+  - id_lugar_fisico_de_trabajo -> areas.id_area
+
+Tablas que dependen de esta (FK externas):
+  - empleados.id_empleado
+
+==================================================
+TABLA: empleados_datos_laborales
+==================================================
+
+Columnas:
+  - id_empleado_datos_laborales | integer              | Null: NO  | Def: None
+  - rfc                       | text                 | Null: YES | Def: None
+  - num_empleado              | text                 | Null: YES | Def: None
+  - curp                      | text                 | Null: YES | Def: None
+  - nss                       | text                 | Null: YES | Def: None
+  - esta_borrado              | boolean              | Null: NO  | Def: false
+  - id_categoria_del_empleado | integer              | Null: YES | Def: None
+
+Primary Key: id_empleado_datos_laborales
+
+Relaciones (FK):
+  - id_empleado_datos_laborales -> empleados_datos_laborales.id_empleado_datos_laborales
+
+Tablas que dependen de esta (FK externas):
+  - empleados_datos_laborales.id_empleado_datos_laborales
+  - empleados_original.id_empleado_datos_laborales
+  - empleados.id_empleado_datos_laborales
+
+==================================================
+TABLA: categorias
+==================================================
+
+Columnas:
+  - id_categoria              | integer              | Null: NO  | Def: nextval('categorias_id_categoria_seq'::regclass)
+  - puesto                    | character varying    | Null: NO  | Def: None
+  - esta_borrado              | boolean              | Null: YES | Def: false
+
+Primary Key: id_categoria
+
+Relaciones (FK):
+  - id_categoria -> categorias.id_categoria
+
+Tablas que dependen de esta (FK externas):
+  - categorias.id_categoria
+  - categorias_del_empleado.categoria
+
+==================================================
+TABLA: categorias_del_empleado
+==================================================
+
+Columnas:
+  - id_categoria_del_empleado | integer              | Null: NO  | Def: None
+  - clave_categoria           | integer              | Null: NO  | Def: None
+  - literal                   | text                 | Null: NO  | Def: None
+  - puesto                    | text                 | Null: YES | Def: None
+  - esta_borrado              | boolean              | Null: NO  | Def: false
+  - literal_viatico           | text                 | Null: YES | Def: None
+  - categoria                 | integer              | Null: YES | Def: None
+
+Primary Key: id_categoria_del_empleado
+
+Relaciones (FK):
+  - id_categoria_del_empleado -> categorias_del_empleado.id_categoria_del_empleado
+  - categoria -> categorias.id_categoria
+
+Tablas que dependen de esta (FK externas):
+  - categorias_del_empleado.id_categoria_del_empleado
+
+==================================================
+TABLA: cargos
+==================================================
+
+Columnas:
+  - id_cargo                  | integer              | Null: NO  | Def: None
+  - cargo                     | text                 | Null: NO  | Def: None
+  - esta_borrado              | boolean              | Null: NO  | Def: false
+
+Primary Key: id_cargo
+
+Relaciones (FK):
+  - id_cargo -> cargos.id_cargo
+
+Tablas que dependen de esta (FK externas):
+  - cargos.id_cargo
+  - empleados_original.id_cargo
+  - empleados.id_cargo
+
+==================================================
+TABLA: puestos
+==================================================
+
+Columnas:
+  - puesto_id                 | integer              | Null: NO  | Def: None
+  - puesto                    | text                 | Null: NO  | Def: None
+  - esta_activo               | boolean              | Null: NO  | Def: true
+
+Primary Key: puesto_id
+
+Relaciones (FK):
+  - puesto_id -> puestos.puesto_id
+
+Tablas que dependen de esta (FK externas):
+  - puestos.puesto_id
+
+==================================================
+TABLA: areas
+==================================================
+
+Columnas:
+  - id_area                   | integer              | Null: NO  | Def: None
+  - id_estructura_administrativa | integer              | Null: YES | Def: None
+  - clave_area                | text                 | Null: NO  | Def: None
+  - clave_subarea             | text                 | Null: NO  | Def: None
+  - clave_ocupacion           | text                 | Null: NO  | Def: None
+  - descripcion               | text                 | Null: NO  | Def: None
+  - esta_borrado              | boolean              | Null: NO  | Def: false
+  - oficio                    | character varying    | Null: YES | Def: None
+
+Primary Key: id_area
+
+Relaciones (FK):
+  - id_area -> areas.id_area
+  - id_estructura_administrativa -> estructuras_administrativas.id_estructura_administrativa
+
+Tablas que dependen de esta (FK externas):
+  - areas.id_area
+  - empleados_original.id_area
+  - vales_de_salida.id_area
+  - firmas_por_area.id_area
+  - empleados.id_area
+  - empleados.id_lugar_fisico_de_trabajo
+
+==================================================
+TABLA: unidades
+==================================================
+
+Columnas:
+  - id_unidad                 | integer              | Null: NO  | Def: None
+  - unidad                    | text                 | Null: NO  | Def: None
+  - abreviatura               | text                 | Null: YES | Def: None
+  - esta_borrado              | boolean              | Null: NO  | Def: false
+
+Primary Key: id_unidad
+
+Relaciones (FK):
+  - id_unidad -> unidades.id_unidad
+
+Tablas que dependen de esta (FK externas):
+  - unidades.id_unidad
+  - productos.id_unidad
+  - productos.id_unidad_secundaria
+  - vales_de_entrada_detalle.id_unidad
+  - vales_de_salida_detalle.id_unidad
+
+==================================================
+TABLA: estructuras_administrativas
+==================================================
+
+Columnas:
+  - id_estructura_administrativa | integer              | Null: NO  | Def: None
+  - clave_clasificacion_administrativa | text                 | Null: NO  | Def: None
+  - clave_unidad_responsable  | text                 | Null: NO  | Def: None
+  - clave_uro                 | text                 | Null: NO  | Def: None
+  - descripcion               | text                 | Null: NO  | Def: None
+  - esta_borrado              | boolean              | Null: NO  | Def: false
+
+Primary Key: id_estructura_administrativa
+
+Relaciones (FK):
+  - id_estructura_administrativa -> estructuras_administrativas.id_estructura_administrativa
+
+Tablas que dependen de esta (FK externas):
+  - estructuras_administrativas.id_estructura_administrativa
+  - areas.id_estructura_administrativa
+  - proyectos_estrategicos.id_estructura_administrativa
+
+==================================================
+TABLA: firmas
+==================================================
+
+Columnas:
+  - id_firma                  | integer              | Null: NO  | Def: None
+  - nombre_firma              | text                 | Null: NO  | Def: None
+  - cargo_firma               | text                 | Null: NO  | Def: None
+  - descripcion               | text                 | Null: YES | Def: None
+  - esta_borrado              | boolean              | Null: NO  | Def: false
+
+Primary Key: id_firma
+
+Relaciones (FK):
+  - id_firma -> firmas.id_firma
+
+Tablas que dependen de esta (FK externas):
+  - firmas.id_firma
+  - firmas_por_area.id_firma
+  - firmas_adicionales_empleado.id_firma
+  - memorandum_comision.id_firma
+  - detalles_viaticos.id_firma_autoriza
+  - detalles_viaticos.id_firma_fija
+  - tramites.id_firma
+
+==================================================
+TABLA: firmas_adicionales_empleado
+==================================================
+
+Columnas:
+  - id                        | integer              | Null: NO  | Def: None
+  - id_empleado               | integer              | Null: NO  | Def: None
+  - id_firma                  | integer              | Null: NO  | Def: None
+  - fecha_asignacion          | timestamp without time zone | Null: YES | Def: CURRENT_TIMESTAMP
+  - esta_borrado              | boolean              | Null: NO  | Def: false
+
+Primary Key: id
+
+Relaciones (FK):
+  - id -> firmas_adicionales_empleado.id
+  - id_empleado -> empleados_original.id_empleado
+  - id_firma -> firmas.id_firma
+
+Tablas que dependen de esta (FK externas):
+  - firmas_adicionales_empleado.id
+
+==================================================
+TABLA: firmas_por_area
+==================================================
+
+Columnas:
+  - id_firma_area             | integer              | Null: NO  | Def: None
+  - id_area                   | integer              | Null: NO  | Def: None
+  - id_firma                  | integer              | Null: NO  | Def: None
+  - esta_borrado              | boolean              | Null: NO  | Def: false
+
+Primary Key: id_firma_area
+
+Relaciones (FK):
+  - id_firma_area -> firmas_por_area.id_firma_area
+  - id_area -> areas.id_area
+  - id_firma -> firmas.id_firma
+
+Tablas que dependen de esta (FK externas):
+  - firmas_por_area.id_firma_area
+
+==================================================
+TABLA: usuarios
+==================================================
+
+Columnas:
+  - id_usuario                | integer              | Null: NO  | Def: None
+  - id_rol                    | integer              | Null: YES | Def: None
+  - nombres                   | text                 | Null: NO  | Def: None
+  - apellidos                 | text                 | Null: NO  | Def: None
+  - correo                    | text                 | Null: YES | Def: None
+  - usuario                   | text                 | Null: NO  | Def: None
+  - contraseña                | text                 | Null: NO  | Def: None
+  - foto                      | text                 | Null: YES | Def: None
+  - id_empleado               | integer              | Null: YES | Def: None
+  - esta_borrado              | boolean              | Null: NO  | Def: false
+
+Primary Key: id_usuario
+
+Relaciones (FK):
+  - id_usuario -> usuarios.id_usuario
+  - usuario -> usuarios.usuario
+  - id_empleado -> empleados_original.id_empleado
+  - id_rol -> roles.id_rol
+
+Tablas que dependen de esta (FK externas):
+  - usuarios.id_usuario
+  - usuarios.usuario
+  - vales_de_salida.merma_autorizada_por
+  - actividades.id_usuario
+  - tramites.id_usuario
+
+==================================================
+TABLA: roles
+==================================================
+
+Columnas:
+  - id_rol                    | integer              | Null: NO  | Def: None
+  - rol                       | text                 | Null: NO  | Def: None
+  - esta_borrado              | boolean              | Null: NO  | Def: false
+
+Primary Key: id_rol
+
+Relaciones (FK):
+  - id_rol -> roles.id_rol
+
+Tablas que dependen de esta (FK externas):
+  - roles.id_rol
+  - permisos.id_rol
+  - usuarios.id_rol
+
+==================================================
+TABLA: tramites
+==================================================
+
+Columnas:
+  - id_tramite                | integer              | Null: NO  | Def: nextval('tramites_id_tramite_seq'::regclass)
+  - folio                     | character varying    | Null: YES | Def: None
+  - fecha                     | date                 | Null: NO  | Def: None
+  - observaciones             | text                 | Null: YES | Def: None
+  - enviado                   | boolean              | Null: YES | Def: false
+  - id_usuario                | integer              | Null: YES | Def: None
+  - fecha_creacion            | timestamp without time zone | Null: YES | Def: CURRENT_TIMESTAMP
+  - esta_borrado              | boolean              | Null: YES | Def: false
+  - id_firma                  | integer              | Null: YES | Def: None
+  - importe                   | numeric              | Null: YES | Def: 0
+
+Primary Key: id_tramite
+
+Relaciones (FK):
+  - id_tramite -> tramites.id_tramite
+  - id_usuario -> usuarios.id_usuario
+  - id_firma -> firmas.id_firma
+
+Tablas que dependen de esta (FK externas):
+  - tramites.id_tramite
+  - tramite_comisiones.id_tramite
+
+==================================================
+TABLA: comisiones
+==================================================
+
+Columnas:
+  - id_comision               | integer              | Null: NO  | Def: None
+  - id_empleado               | integer              | Null: NO  | Def: None
+  - id_municipio_destino      | integer              | Null: NO  | Def: None
+  - fecha_inicio              | date                 | Null: NO  | Def: None
+  - fecha_fin                 | date                 | Null: NO  | Def: None
+  - dias                      | integer              | Null: NO  | Def: None
+  - monto_total               | numeric              | Null: YES | Def: None
+
+Primary Key: id_comision
+
+Relaciones (FK):
+  - id_comision -> comisiones.id_comision
+  - id_empleado -> empleados_original.id_empleado
+  - id_municipio_destino -> municipios.id_municipio
+
+Tablas que dependen de esta (FK externas):
+  - comisiones.id_comision

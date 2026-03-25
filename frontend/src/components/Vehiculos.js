@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
 import {
@@ -19,7 +19,7 @@ const Vehiculos = () => {
         numero_de_motor: '',
         serie: '',
         id_estatus_de_vehiculo: '',
-        id_usos_de_vehiculo: '',
+        id_uso_del_vehiculo: '',
         id_empleado: '',
         id_estructura_administrativa: 1
     });
@@ -127,7 +127,7 @@ const Vehiculos = () => {
             numero_de_motor: vehiculo.numero_de_motor,
             serie: vehiculo.serie,
             id_estatus_de_vehiculo: vehiculo.id_estatus_de_vehiculo,
-            id_usos_de_vehiculo: vehiculo.id_usos_de_vehiculo,
+            id_uso_del_vehiculo: vehiculo.id_uso_del_vehiculo,
             id_empleado: vehiculo.id_empleado,
             id_estructura_administrativa: 1
         });
@@ -173,7 +173,7 @@ const Vehiculos = () => {
             numero_de_motor: '',
             serie: '',
             id_estatus_de_vehiculo: '',
-            id_usos_de_vehiculo: '',
+            id_uso_del_vehiculo: '',
             id_empleado: '',
             id_estructura_administrativa: 1
         });
@@ -184,11 +184,17 @@ const Vehiculos = () => {
         setPage(newPage);
     };
 
-    const filteredVehiculos = vehiculos.filter(v =>
-        (v.numero_economico && v.numero_economico.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (v.marca_de_vehiculo && v.marca_de_vehiculo.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (v.placas_actuales && v.placas_actuales.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+    const filteredVehiculos = useMemo(() => {
+        if (!Array.isArray(vehiculos)) return [];
+        if (!searchTerm) return vehiculos;
+
+        const search = searchTerm.toLowerCase();
+        return vehiculos.filter(v =>
+            (v.numero_economico?.toLowerCase().includes(search)) ||
+            (v.marca_de_vehiculo?.toLowerCase().includes(search)) ||
+            (v.placas_actuales?.toLowerCase().includes(search))
+        );
+    }, [vehiculos, searchTerm]);
 
     const visibleRows = React.useMemo(
         () => filteredVehiculos.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
@@ -287,11 +293,11 @@ const Vehiculos = () => {
                             </TextField>
                             <TextField select label="Tipo" name="id_tipo_de_vehiculo" value={formData.id_tipo_de_vehiculo} onChange={handleChange} required fullWidth variant="outlined" sx={inputStyles}>
                                 <MenuItem value="">Seleccione tipo</MenuItem>
-                                {catalogs.tipos.map(t => <MenuItem key={t.id_tipos_de_vehiculo} value={t.id_tipos_de_vehiculo}>{t.tipos_de_vehiculo}</MenuItem>)}
+                                {catalogs.tipos.map(t => <MenuItem key={t.id_tipo_de_vehiculo} value={t.id_tipo_de_vehiculo}>{t.tipo_de_vehiculo}</MenuItem>)}
                             </TextField>
                             <TextField select label="Clase" name="id_clase_de_vehiculo" value={formData.id_clase_de_vehiculo} onChange={handleChange} required fullWidth variant="outlined" sx={inputStyles}>
                                 <MenuItem value="">Seleccione clase</MenuItem>
-                                {catalogs.clases.map(c => <MenuItem key={c.id_clases_de_vehiculo} value={c.id_clases_de_vehiculo}>{c.clases_de_vehiculo}</MenuItem>)}
+                                {catalogs.clases.map(c => <MenuItem key={c.id_clase_de_vehiculo} value={c.id_clase_de_vehiculo}>{c.clase_de_vehiculo}</MenuItem>)}
                             </TextField>
                         </Box>
 
@@ -300,9 +306,9 @@ const Vehiculos = () => {
                                 <MenuItem value="">Seleccione estatus</MenuItem>
                                 {catalogs.estatus.map(e => <MenuItem key={e.id_estatus_de_vehiculo} value={e.id_estatus_de_vehiculo}>{e.estatus_de_vehiculo}</MenuItem>)}
                             </TextField>
-                            <TextField select label="Uso" name="id_usos_de_vehiculo" value={formData.id_usos_de_vehiculo} onChange={handleChange} required fullWidth variant="outlined" sx={inputStyles}>
+                            <TextField select label="Uso" name="id_uso_del_vehiculo" value={formData.id_uso_del_vehiculo} onChange={handleChange} required fullWidth variant="outlined" sx={inputStyles}>
                                 <MenuItem value="">Seleccione uso</MenuItem>
-                                {catalogs.usos.map(u => <MenuItem key={u.id_usos_de_vehiculo} value={u.id_usos_de_vehiculo}>{u.usos_de_vehiculo}</MenuItem>)}
+                                {catalogs.usos.map(u => <MenuItem key={u.id_uso_del_vehiculo} value={u.id_uso_del_vehiculo}>{u.uso_del_vehiculo}</MenuItem>)}
                             </TextField>
                             <TextField select label="Resguardatario" name="id_empleado" value={formData.id_empleado} onChange={handleChange} required fullWidth variant="outlined" sx={inputStyles}>
                                 <MenuItem value="">Seleccione empleado</MenuItem>
@@ -437,7 +443,7 @@ const Vehiculos = () => {
                                 <TableRow key={vehiculo.id_vehiculo} sx={{ backgroundColor: '#1e293b', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3)', borderRadius: '16px', transition: 'transform 0.2s, box-shadow 0.2s, background-color 0.2s', '&:hover': { transform: 'translateY(-2px)', backgroundColor: '#334155', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3)' }, '& td': { borderBottom: 'none' }, '& td:first-of-type': { borderTopLeftRadius: '16px', borderBottomLeftRadius: '16px' }, '& td:last-of-type': { borderTopRightRadius: '16px', borderBottomRightRadius: '16px' } }}>
                                     <TableCell align="center"><Typography sx={{ fontWeight: 700, color: '#f8fafc', fontSize: '0.875rem' }}>{vehiculo.numero_economico}</Typography></TableCell>
                                     <TableCell align="center"><Typography sx={{ fontWeight: 600, color: '#cbd5e1', fontSize: '0.8rem' }}>{vehiculo.marca_de_vehiculo}</Typography></TableCell>
-                                    <TableCell align="center"><Typography sx={{ fontWeight: 600, color: '#cbd5e1', fontSize: '0.8rem' }}>{vehiculo.tipos_de_vehiculo}</Typography></TableCell>
+                                    <TableCell align="center"><Typography sx={{ fontWeight: 600, color: '#cbd5e1', fontSize: '0.8rem' }}>{vehiculo.tipo_de_vehiculo}</Typography></TableCell>
                                     <TableCell align="center"><Typography sx={{ fontWeight: 600, color: '#cbd5e1', fontSize: '0.8rem' }}>{vehiculo.modelo}</Typography></TableCell>
                                     <TableCell align="center"><Chip label={vehiculo.placas_actuales} size="small" sx={{ backgroundColor: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.2)', fontWeight: 700, borderRadius: '6px', fontSize: '0.75rem' }} /></TableCell>
                                     <TableCell align="center"><Typography sx={{ fontWeight: 600, color: '#94a3b8', fontSize: '0.75rem' }}>{vehiculo.uso}</Typography></TableCell>

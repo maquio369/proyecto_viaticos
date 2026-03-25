@@ -10,6 +10,8 @@ router.post('/', auth, async (req, res) => {
     const { id_actividad, id_empleado, periodo_inicio, periodo_fin, tipo_transporte, id_firma, observaciones, id_vehiculo } = req.body;
     const id_usuario = req.user.id;
 
+    const id_vehiculo_final = id_vehiculo === '' ? null : id_vehiculo;
+
     // 1. Insertar el memorandum
     const result = await pool.query(
       `INSERT INTO memorandum_comision (
@@ -23,7 +25,7 @@ router.post('/', auth, async (req, res) => {
         id_vehiculo
       ) 
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id_memorandum_comision`,
-      [id_actividad, id_empleado, periodo_inicio, periodo_fin, tipo_transporte, id_firma, observaciones, id_vehiculo]
+      [id_actividad, id_empleado, periodo_inicio, periodo_fin, tipo_transporte, id_firma, observaciones, id_vehiculo_final]
     );
 
     const id_memo = result.rows[0].id_memorandum_comision;
@@ -111,7 +113,8 @@ router.get('/:id/firma', auth, async (req, res) => {
   try {
     const { id } = req.params;
     const result = await pool.query(
-      `SELECT m.id_firma, f.nombre_firma, f.cargo_firma, a.fecha as fecha_actividad
+      `SELECT m.id_firma, f.nombre_firma, f.cargo_firma, a.fecha as fecha_actividad,
+               m.periodo_inicio, m.periodo_fin
        FROM memorandum_comision m
        JOIN firmas f ON m.id_firma = f.id_firma
        JOIN actividades a ON m.id_actividad = a.id_actividad
@@ -135,6 +138,26 @@ router.get('/:id/firma', auth, async (req, res) => {
 router.delete('/:id', auth, async (req, res) => {
   try {
     const { id } = req.params;
+
+    // 1. Verificar si tiene viáticos asociados
+    const checkViaticos = await pool.query(
+      'SELECT id_detalle_viatico FROM detalles_viaticos WHERE id_memorandum_comision = $1 LIMIT 1',
+      [id]
+    );
+
+    // 2. Verificar si tiene gastos globales asociados
+    const checkGastos = await pool.query(
+      'SELECT id_gasto_global FROM gastos_globales_memorandum WHERE id_memorandum_comision = $1 AND esta_borrado = false LIMIT 1',
+      [id]
+    );
+
+    if (checkViaticos.rows.length > 0 || checkGastos.rows.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No se puede eliminar el memorandum porque ya tiene cálculos de viáticos o gastos asociados.'
+      });
+    }
+
     const result = await pool.query(
       'UPDATE memorandum_comision SET esta_borrado = true WHERE id_memorandum_comision = $1 RETURNING *',
       [id]
@@ -157,6 +180,8 @@ router.put('/:id', auth, async (req, res) => {
     const { id } = req.params;
     const { id_actividad, id_empleado, periodo_inicio, periodo_fin, tipo_transporte, id_firma, observaciones, id_vehiculo } = req.body;
 
+    const id_vehiculo_final = id_vehiculo === '' ? null : id_vehiculo;
+
     const result = await pool.query(
       `UPDATE memorandum_comision 
        SET id_actividad = $1, 
@@ -169,7 +194,7 @@ router.put('/:id', auth, async (req, res) => {
            id_vehiculo = $8
        WHERE id_memorandum_comision = $9 AND esta_borrado = false
        RETURNING *`,
-      [id_actividad, id_empleado, periodo_inicio, periodo_fin, tipo_transporte, id_firma, observaciones, id_vehiculo, id]
+      [id_actividad, id_empleado, periodo_inicio, periodo_fin, tipo_transporte, id_firma, observaciones, id_vehiculo_final, id]
     );
 
     if (result.rowCount === 0) {

@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 7.0.3.final using JasperReports Library version 6.11.0  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MEMORANDUM_OFICIAL" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b58c88ef-e228-4d67-993b-e69aec91b773">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="New Data Adapter local"/>
+	<parameter name="id_memo" class="java.lang.Integer"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT * FROM viaticos.fn_reporte_memorandum_oficial($P{id_memo})]]>
+	</queryString>
+	<field name="memorandum_no" class="java.lang.String"/>
+	<field name="fecha_reporte" class="java.lang.String"/>
+	<field name="nombre_empleado" class="java.lang.String"/>
+	<field name="puesto_empleado" class="java.lang.String"/>     
+	<field name="motivo_comision" class="java.lang.String"/>
+	<field name="lugar_comision" class="java.lang.String"/>
+	<field name="periodo_comision" class="java.lang.String"/>
+	<field name="medio_transporte" class="java.lang.String"/>
+	<field name="observaciones" class="java.lang.String"/>
+	<field name="nombre_autoriza" class="java.lang.String"/>
+	<field name="cargo_autoriza" class="java.lang.String"/>
+	<field name="organismo" class="java.lang.String"/>
+	<field name="area_nombre" class="java.lang.String"/>
+	<title>
+		<band height="95">z
+			<staticText>
+				<reportElement x="0" y="0" width="555" height="15" uuid="7a396263-ce3f-4886-993e-089c8942978a"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[OFICINA DEL GOBERNADOR]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="15" width="555" height="15" uuid="9c10486c-0e8c-4a1d-aef3-2070624d45c4"/>
+				<textElement textAlignment="Center">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{organismo}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="30" width="555" height="15" uuid="f90a9b88-1d74-42b7-86f3-a3d2424b3356"/>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{area_nombre}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="250" y="55" width="305" height="13" uuid="607374a5-673c-4113-9791-62867808269d"/>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Memorándum No.: " + ($F{memorandum_no} != null ? $F{memorandum_no} : "N/A")]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="250" y="68" width="305" height="13" uuid="d6e3c0b3-9c7a-42cd-944a-f2b3e818b2c4"/>
+				<textElement textAlignment="Right">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Tuxtla Gutiérrez, Chiapas.]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="250" y="81" width="305" height="13" uuid="b5c490a6-9817-4861-bb3e-79753e19213f"/>
+				<textElement textAlignment="Right">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{fecha_reporte}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="85">
+			<textField>
+				<reportElement x="0" y="10" width="400" height="13" uuid="f6d141e6-231a-4c22-9214-e0b6ec513812"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["C. " + ($F{nombre_empleado} != null ? $F{nombre_empleado} : "")]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="23" width="400" height="13" uuid="90731032-4d00-47b8-80f2-536dc40b4ee8"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{puesto_empleado}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="36" width="100" height="13" uuid="453086eb-4682-491c-8066-608bfafe504d"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Presente]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="65" width="555" height="13" uuid="fb4b0c6c-8e43-4e4d-bed5-cf80ef8a5c2d"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Por este conducto, me permito comisionar a usted de acuerdo a lo siguiente:]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="185">
+			<staticText>
+				<reportElement x="0" y="10" width="555" height="13" uuid="a63907c1-2292-4f39-b9c2-570a2f7c64f7"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Motivo de la comisión:]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="23" width="555" height="15" uuid="d6a2f77b-2311-447a-8534-86a01124430e"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{motivo_comision}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement positionType="Float" x="0" y="45" width="555" height="13" uuid="e73917c2-2192-4f39-b9c2-570a2f7c64f7"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Lugar de la comisión:]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="58" width="555" height="15" uuid="f6a2f77b-2311-447a-8534-86a01124430e"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{lugar_comision}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement positionType="Float" x="0" y="80" width="555" height="13" uuid="673917c2-2192-4f39-b9c2-570a2f7c64f7"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Período de la comisión:]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="93" width="555" height="15" uuid="16a2f77b-2311-447a-8534-86a01124430e"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{periodo_comision}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement positionType="Float" x="0" y="115" width="555" height="13" uuid="773917c2-2192-4f39-b9c2-570a2f7c64f7"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Medio de Transporte:]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="128" width="555" height="15" uuid="26a2f77b-2311-447a-8534-86a01124430e"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{medio_transporte}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement positionType="Float" x="0" y="150" width="555" height="13" uuid="873917c2-2192-4f39-b9c2-570a2f7c64f7"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Observaciones:]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="163" width="555" height="15" uuid="36a2f77b-2311-447a-8534-86a01124430e"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{observaciones}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="120">
+			<staticText>
+				<reportElement x="0" y="20" width="200" height="13" uuid="973917c2-2192-4f39-b9c2-570a2f7c64f7"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ATENTAMENTE]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="70" width="400" height="13" uuid="46a2f77b-2311-447a-8534-86a01124430e"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nombre_autoriza}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="83" width="400" height="13" uuid="56a2f77b-2311-447a-8534-86a01124430e"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cargo_autoriza}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

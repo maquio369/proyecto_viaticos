@@ -2,17 +2,27 @@ const pool = require('../config/database');
 
 async function checkColumns() {
     try {
-        const res = await pool.query(`
-      SELECT column_name, data_type 
-      FROM information_schema.columns 
-      WHERE table_name = 'categorias_del_empleado'
-    `);
-        console.log('Columns in categorias_del_empleado:');
-        res.rows.forEach(row => console.log(`- ${row.column_name} (${row.data_type})`));
+        console.log('--- Columns for tipos_de_vehiculos ---');
+        const cols = await pool.query(`
+            SELECT column_name, data_type 
+            FROM information_schema.columns 
+            WHERE table_name = 'tipos_de_vehiculos'
+            ORDER BY ordinal_position;
+        `);
+        console.log(JSON.stringify(cols.rows, null, 2));
+
+        console.log('--- Columns for vehiculos ---');
+        const vCols = await pool.query(`
+            SELECT column_name, data_type 
+            FROM information_schema.columns 
+            WHERE table_name = 'vehiculos'
+            ORDER BY ordinal_position;
+        `);
+        console.log(JSON.stringify(vCols.rows, null, 2));
     } catch (err) {
-        console.error('Error checking columns:', err);
+        console.error(err);
     } finally {
-        pool.end();
+        await pool.end();
     }
 }
 

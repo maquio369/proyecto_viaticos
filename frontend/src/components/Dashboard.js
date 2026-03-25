@@ -3,25 +3,30 @@ import axios from 'axios';
 import Tarifas from './Tarifas';
 import {
   Drawer, List, ListItemButton, ListItemIcon, ListItemText, Collapse,
-  CssBaseline, AppBar, Toolbar, Typography, Box, Avatar, Button, IconButton, Tooltip, Paper
+  CssBaseline, AppBar, Toolbar, Typography, Box, Avatar, Button, IconButton, Tooltip
 } from '@mui/material';
 import {
   Book, People, DirectionsCar, Description, Receipt, AccountBalanceWallet, AccountBalance,
   Assignment, Send, CheckCircle, BarChart, ExpandLess, ExpandMore, Menu as MenuIcon, ChevronLeft,
-  AccessTime, AttachMoney, CalendarMonth
+  AccessTime, AttachMoney, CalendarMonth, Layers as LayersIcon, AccountTree
 } from '@mui/icons-material';
 import Actividad from './Actividad';
 import MemorandumComision from './MemorandumComision';
 import GestionFirmas from './GestionFirmas';
+import GestionCategorias from './GestionCategorias';
 import CuentaPersonal from './CuentaPersonal';
 import Vehiculos from './Vehiculos';
 import Tramites from './Tramites';
+import GestionEmpleados from './GestionEmpleados';
+import AreasTree from './AreasTree';
 
 const drawerWidth = 240;
 const drawerWidthCollapsed = 72; // Width when collapsed
 
 const menuIcons = {
   catalogos: <Book />,
+  gestion_personal: <People />,
+  imprimir_personal: <People />,
   captura: <Description />,
   procesos: <Assignment />,
   reportes: <BarChart />,
@@ -29,6 +34,7 @@ const menuIcons = {
   personal: <People />,
   vehiculos: <DirectionsCar />,
   firmas: <CheckCircle />,
+  categorias: <LayersIcon />,
   cuenta_personal: <AccountBalance />,
   actividad: <Assignment />,
   memo: <Description />,
@@ -39,7 +45,8 @@ const menuIcons = {
   deposito: <AccountBalanceWallet />,
   actividades: <BarChart />,
   memorandum: <BarChart />,
-  viaticos: <BarChart />
+  viaticos: <BarChart />,
+  areas_tree: <AccountTree />
 };
 
 const Dashboard = ({ user, setUser, handleLogout }) => {
@@ -50,14 +57,15 @@ const Dashboard = ({ user, setUser, handleLogout }) => {
     procesos: false,
     reportes: false,
     personal: false,
-    vehiculos: false
+    vehiculos: false,
+    gestion_personal: false
   });
   // Initialize currentView from localStorage
   const [currentView, setCurrentView] = useState(() => {
     return localStorage.getItem('currentView') || null;
   });
 
-  const [vehiculoEditar, setVehiculoEditar] = useState(null);
+
   const [dateTime, setDateTime] = useState(new Date());
   const [exchangeRate, setExchangeRate] = useState(null);
 
@@ -84,16 +92,21 @@ const Dashboard = ({ user, setUser, handleLogout }) => {
   }, []);
 
   const menuStructure = {
+    gestion_personal: {
+      title: 'Personal',
+      items: {
+        imprimir_personal: { title: 'Imprimir Personal' },
+        gestion_empleados: { title: 'Captura de Empleados' },
+        categorias: { title: 'Categorías' }
+      }
+    },
     catalogos: {
       title: 'Catálogos',
       items: {
         tarifa: { title: 'Tarifa' },
-        personal: {
-          title: 'Personal',
-          subitems: { imprimir: 'Imprimir' }
-        },
         vehiculos: { title: 'Vehículos' },
-        firmas: { title: 'Firmas' }
+        firmas: { title: 'Firmas' },
+        areas_tree: { title: 'Estructura de Áreas' }
       }
     },
     captura: {
@@ -379,8 +392,14 @@ const Dashboard = ({ user, setUser, handleLogout }) => {
           <CuentaPersonal handleLogout={handleLogout} />
         ) : currentView === 'vehiculos' ? (
           <Vehiculos />
+        ) : currentView === 'categorias' ? (
+          <GestionCategorias />
+        ) : currentView === 'gestion_empleados' ? (
+          <GestionEmpleados />
         ) : currentView === 'tramite' ? (
           <Tramites user={user} />
+        ) : currentView === 'areas_tree' ? (
+          <AreasTree />
         ) : (
           <Box sx={{ p: 4, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Typography variant="h3" sx={{ mb: 1, textAlign: 'center', color: '#f8fafc', fontWeight: 900, letterSpacing: '-0.025em' }}>

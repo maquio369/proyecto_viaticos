@@ -3,17 +3,18 @@ const pool = require('../config/database');
 const auth = require('../middleware/auth');
 const router = express.Router();
 
-// Obtener empleados que pueden ser firmas (solo cargos específicos)
+// Obtener empleados que pueden ser firmas
 router.get('/empleados-firmantes', async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT e.id_empleado, e.nombres, e.apellido1, e.apellido2, 
-             c.cargo, a.descripcion as area_nombre
+             p.nombre_puesto as cargo, a.descripcion as area_nombre
       FROM empleados e
-      LEFT JOIN cargos c ON e.id_cargo = c.id_cargo
       LEFT JOIN areas a ON e.id_area = a.id_area
+      LEFT JOIN empleados_datos_laborales edl ON e.id_empleado_datos_laborales = edl.id_empleado_datos_laborales
+      LEFT JOIN categorias_del_empleado cde ON edl.id_categoria_del_empleado = cde.id_categoria_del_empleado
+      LEFT JOIN puestos p ON cde.id_puesto = p.id_puesto
       WHERE e.esta_borrado = false 
-        AND e.id_cargo IN (17,18,19,20,21,22,23,24,31,32,33,34)
       ORDER BY e.nombres, e.apellido1
     `);
     res.json({
@@ -55,7 +56,7 @@ router.get('/empleado/:id_empleado', async (req, res) => {
     const tablaExiste = await pool.query(`
       SELECT EXISTS (
         SELECT FROM information_schema.tables 
-        WHERE table_schema = 'public' 
+        WHERE table_schema = 'viaticos' 
         AND table_name = 'excepciones_firmas_empleado'
       )
     `);
@@ -145,10 +146,12 @@ router.post('/agregar-empleado-como-firma', auth, async (req, res) => {
 
     // Obtener datos del empleado firmante
     const empleadoFirmante = await pool.query(`
-      SELECT e.nombres, e.apellido1, e.apellido2, c.cargo
+      SELECT e.nombres, e.apellido1, e.apellido2, p.nombre_puesto as cargo
       FROM empleados e
-      LEFT JOIN cargos c ON e.id_cargo = c.id_cargo
-      WHERE e.id_empleado = $1 AND e.id_cargo IN (17,18,19,20,21,22,23,24,31,32,33,34)
+      LEFT JOIN empleados_datos_laborales edl ON e.id_empleado_datos_laborales = edl.id_empleado_datos_laborales
+      LEFT JOIN categorias_del_empleado cde ON edl.id_categoria_del_empleado = cde.id_categoria_del_empleado
+      LEFT JOIN puestos p ON cde.id_puesto = p.id_puesto
+      WHERE e.id_empleado = $1
     `, [id_empleado_firmante]);
 
     if (empleadoFirmante.rows.length === 0) {

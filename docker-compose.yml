@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: viaticos-backend
+    restart: always
+    ports:
+      - "26:5000"
+    env_file:
+      - ./backend/.env
+    networks:
+      - viaticos-net
+
+  frontend:
+    build: ./frontend
+    container_name: viaticos-frontend
+    restart: always
+    ports:
+      - "27:80"
+    depends_on:
+      - backend
+    networks:
+      - viaticos-net
+
+networks:
+  viaticos-net:
+    driver: bridge

@@ -42,6 +42,7 @@ const MemorandumComision = () => {
   });
 
   const [actividades, setActividades] = useState([]);
+  const [selectedActivityDate, setSelectedActivityDate] = useState(null);
   const [empleados, setEmpleados] = useState([]);
   const [vehiculos, setVehiculos] = useState([]);
   const [firmasDisponibles, setFirmasDisponibles] = useState([]);
@@ -68,7 +69,11 @@ const MemorandumComision = () => {
       cargarMemorandums();
     } catch (error) {
       console.error('Error eliminando memorandum:', error);
-      setSnackbar({ open: true, message: 'Error al eliminar el memorandum', severity: 'error' });
+      setSnackbar({
+        open: true,
+        message: error.response?.data?.message || 'Error al eliminar el memorandum',
+        severity: 'error'
+      });
     } finally {
       setActionLoading(false);
     }
@@ -80,6 +85,17 @@ const MemorandumComision = () => {
     cargarVehiculos();
     cargarMemorandums();
   }, []);
+
+  useEffect(() => {
+    if (formData.id_actividad) {
+      const act = actividades.find(a => a.id_actividad === formData.id_actividad);
+      if (act) {
+        setSelectedActivityDate(act.fecha.split('T')[0]);
+      }
+    } else {
+      setSelectedActivityDate(null);
+    }
+  }, [formData.id_actividad, actividades]);
 
   useEffect(() => {
     if (formData.id_empleado) {
@@ -159,13 +175,66 @@ const MemorandumComision = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => {
+      const newData = { ...prev, [name]: value };
+
+      // Auto-adjust end date if start date is changed to be after it
+      if (name === 'periodo_inicio' && newData.periodo_fin && value > newData.periodo_fin) {
+        newData.periodo_fin = value;
+      }
+
+      return newData;
+    });
+  };
+
+  const formatDateSafe = (dateStr) => {
+    if (!dateStr) return '';
+    const [year, month, day] = dateStr.split('-');
+    return `${day}/${month}/${year}`;
+  };
+
+  const esFechaValida = (fecha, esInicio = true) => {
+    if (!fecha) return { valida: true };
+
+    // Validar contra la actividad
+    if (selectedActivityDate) {
+      if (fecha < selectedActivityDate) {
+        return {
+          valida: false,
+          msg: `La fecha no puede ser anterior a la actividad (${formatDateSafe(selectedActivityDate)})`
+        };
+      }
+    }
+
+    // Validar fin contra inicio
+    if (!esInicio && formData.periodo_inicio) {
+      if (fecha < formData.periodo_inicio) {
+        return {
+          valida: false,
+          msg: 'La fecha de fin no puede ser anterior al inicio'
+        };
+      }
+    }
+
+    return { valida: true };
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.id_empleado) {
       setSnackbar({ open: true, message: 'Seleccione un empleado válido', severity: 'warning' });
+      return;
+    }
+
+    const valInicio = esFechaValida(formData.periodo_inicio, true);
+    const valFin = esFechaValida(formData.periodo_fin, false);
+
+    if (!valInicio.valida || !valFin.valida) {
+      setSnackbar({
+        open: true,
+        message: valInicio.msg || valFin.msg || 'Revise las fechas seleccionadas',
+        severity: 'error'
+      });
       return;
     }
 
@@ -231,6 +300,24 @@ const MemorandumComision = () => {
     });
     setFirmasDisponibles([]);
     setShowForm(false);
+  };
+
+  const handleDescargarReporte = async (id, tipo = 'memorandum') => {
+    try {
+      setSnackbar({ open: true, message: 'Generando reporte, por favor espere...', severity: 'info' });
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_BASE_URL}/api/reportes/${tipo}/${id}`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+        responseType: 'blob'
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+      window.open(url, '_blank');
+      setSnackbar({ open: true, message: 'Reporte abierto con éxito', severity: 'success' });
+    } catch (error) {
+      console.error('Error descargando reporte:', error);
+      setSnackbar({ open: true, message: 'Error al descargar el reporte', severity: 'error' });
+    }
   };
 
   const inputStyles = {
@@ -376,7 +463,7 @@ const MemorandumComision = () => {
                   <MenuItem value="" disabled>Seleccione una actividad</MenuItem>
                   {actividades.map(act => (
                     <MenuItem key={act.id_actividad} value={act.id_actividad}>
-                      {act.motivo} - {new Date(act.fecha).toLocaleDateString()}
+                      {act.motivo} - {formatDateSafe(act.fecha.split('T')[0])}
                     </MenuItem>
                   ))}
                 </Select>
@@ -389,14 +476,17 @@ const MemorandumComision = () => {
                 onChange={(event, newValue) => {
                   setFormData(prev => ({ ...prev, id_empleado: newValue ? newValue.id_empleado : '' }));
                 }}
-                renderOption={(props, option) => (
-                  <Box component="li" {...props} sx={{ bgcolor: '#1e293b !important', color: '#f8fafc' }}>
-                    <Box>
-                      <Typography variant="body2" sx={{ fontWeight: 700 }}>{option.nombres} {option.apellido1} {option.apellido2}</Typography>
-                      <Typography variant="caption" sx={{ color: '#94a3b8' }}>{option.lugar_trabajo_nombre || 'Sin lugar asignado'}</Typography>
+                renderOption={(props, option) => {
+                  const { key, ...optionProps } = props;
+                  return (
+                    <Box key={key} component="li" {...optionProps} sx={{ bgcolor: '#1e293b !important', color: '#f8fafc' }}>
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 700 }}>{option.nombres} {option.apellido1} {option.apellido2}</Typography>
+                        <Typography variant="caption" sx={{ color: '#94a3b8' }}>{option.lugar_trabajo_nombre || 'Sin lugar asignado'}</Typography>
+                      </Box>
                     </Box>
-                  </Box>
-                )}
+                  );
+                }}
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -417,6 +507,8 @@ const MemorandumComision = () => {
                 required
                 fullWidth
                 InputLabelProps={{ shrink: true }}
+                error={!esFechaValida(formData.periodo_inicio, true).valida}
+                helperText={esFechaValida(formData.periodo_inicio, true).msg}
                 sx={inputStyles}
               />
 
@@ -429,6 +521,8 @@ const MemorandumComision = () => {
                 required
                 fullWidth
                 InputLabelProps={{ shrink: true }}
+                error={!esFechaValida(formData.periodo_fin, false).valida}
+                helperText={esFechaValida(formData.periodo_fin, false).msg}
                 sx={inputStyles}
               />
 
@@ -514,7 +608,7 @@ const MemorandumComision = () => {
               <Button
                 type="submit"
                 variant="contained"
-                disabled={actionLoading || (formData.id_empleado && firmasDisponibles.length === 0)}
+                disabled={!!actionLoading || !!(formData.id_empleado && firmasDisponibles.length === 0)}
                 startIcon={actionLoading ? <CircularProgress size={20} color="inherit" /> : <AddIcon />}
                 sx={{
                   bgcolor: '#38bdf8',
@@ -582,7 +676,7 @@ const MemorandumComision = () => {
                   </TableCell>
                   <TableCell align="center">
                     <Typography sx={{ color: '#f8fafc', fontWeight: 700, fontSize: '0.9rem' }}>
-                      {new Date(memo.periodo_inicio).toLocaleDateString('es-MX', { day: '2-digit', month: 'short' })}
+                      {formatDateSafe(memo.periodo_inicio.split('T')[0])}
                     </Typography>
                     <Typography sx={{ color: '#94a3b8', fontSize: '0.75rem' }}>Inicio Periodo</Typography>
                   </TableCell>
@@ -647,6 +741,7 @@ const MemorandumComision = () => {
                       <Tooltip title="Reporte Memo">
                         <IconButton
                           size="small"
+                          onClick={() => handleDescargarReporte(memo.id_memorandum_comision)}
                           sx={{
                             color: '#64748b',
                             border: '1px solid #334155',
@@ -707,7 +802,7 @@ const MemorandumComision = () => {
                         <IconButton
                           size="small"
                           onClick={() => setConfirmDialog({ open: true, id: memo.id_memorandum_comision })}
-                          disabled={actionLoading}
+                          disabled={!!actionLoading}
                           sx={{
                             color: '#64748b',
                             border: '1px solid #334155',
@@ -819,14 +914,14 @@ const MemorandumComision = () => {
         <DialogActions sx={{ p: 3, gap: 1 }}>
           <Button
             onClick={() => setConfirmDialog({ open: false, id: null })}
-            disabled={actionLoading}
+            disabled={!!actionLoading}
             sx={{ color: '#94a3b8', fontWeight: 700, textTransform: 'none' }}
           >
             Cancelar
           </Button>
           <Button
             onClick={handleDelete}
-            disabled={actionLoading}
+            disabled={!!actionLoading}
             variant="contained"
             sx={{
               bgcolor: '#f87171',

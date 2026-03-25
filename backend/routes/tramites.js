@@ -9,13 +9,15 @@ router.get('/', auth, async (req, res) => {
         const result = await pool.query(
             `SELECT t.*, 
               CONCAT(e.nombres, ' ', e.apellido1, ' ', e.apellido2) as nombre_solicitante,
-              c.cargo as cargo_solicitante,
+              p.nombre_puesto as cargo_solicitante,
               f.nombre_firma as nombre_autoriza,
               f.cargo_firma as cargo_autoriza
        FROM tramites t
        JOIN usuarios u ON t.id_usuario = u.id_usuario
        JOIN empleados e ON u.id_empleado = e.id_empleado
-       LEFT JOIN cargos c ON e.id_cargo = c.id_cargo
+       LEFT JOIN empleados_datos_laborales edl ON e.id_empleado_datos_laborales = edl.id_empleado_datos_laborales
+       LEFT JOIN categorias_del_empleado cde ON edl.id_categoria_del_empleado = cde.id_categoria_del_empleado
+       LEFT JOIN puestos p ON cde.id_puesto = p.id_puesto
        LEFT JOIN firmas f ON t.id_firma = f.id_firma
        WHERE t.esta_borrado = false
        ORDER BY t.fecha_creacion DESC`
