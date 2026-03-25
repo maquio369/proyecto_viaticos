@@ -24,7 +24,7 @@ const getApiBaseUrl = () => {
 
     // Production domain configuration
     if (hostname === 'sag.chiapas.gob.mx') {
-        return `${protocol}//${hostname}:26`;
+        return `${protocol}//${hostname}:3026`;
     }
 
     // Default to dynamic hostname (works for localhost, 127.0.0.1, and LAN IPs)
