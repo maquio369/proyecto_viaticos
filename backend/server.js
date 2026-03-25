@@ -15,7 +15,9 @@ const app = express();
 app.use(cors({
   origin: [
     'http://sag.chiapas.gob.mx:3027',
+    'http://sag.chiapas.gob.mx',
     'http://localhost:3000',
+    'http://localhost:3027',
     'http://127.0.0.1:3000'
   ],
   credentials: true

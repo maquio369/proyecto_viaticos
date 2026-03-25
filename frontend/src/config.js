@@ -27,6 +27,11 @@ const getApiBaseUrl = () => {
         return `${protocol}//${hostname}:3026`;
     }
 
+    // Docker Local Environment (if frontend is on 3027, backend is on 3026)
+    if (window.location.port === '3027') {
+        return `${protocol}//${hostname}:3026`;
+    }
+
     // Default to dynamic hostname (works for localhost, 127.0.0.1, and LAN IPs)
     return `${protocol}//${hostname}:5000`;
 };
