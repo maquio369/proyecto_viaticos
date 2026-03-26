@@ -118,7 +118,7 @@ class JasperService {
   // Especializado para Memorandum Oficial
   async generateOfficialMemorandumReport(idMemorandum) {
     try {
-      const reportPath = '/Reportes_del_sistema_de_viaticos/memorandum_oficial';
+      const reportPath = '/Reportes_del_sistema_de_viaticos/reporte_actividad';
       const parameters = { 
         id_memo: idMemorandum
       };
