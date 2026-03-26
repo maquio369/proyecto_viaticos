@@ -4,7 +4,7 @@ import { API_BASE_URL } from '../config';
 import {
   Box, Typography, TextField, CircularProgress, Button, Select, MenuItem,
   InputLabel, FormControl, Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, Paper, Chip, IconButton, InputAdornment,
+  TableHead, TableRow, Paper, IconButton, InputAdornment,
   Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert,
   Autocomplete
 } from '@mui/material';
@@ -17,9 +17,7 @@ import {
   PictureAsPdf as PdfIcon,
   Paid as PaidIcon,
   Assignment as AssignmentIcon,
-  LocalShipping as ShippingIcon,
   Person as PersonIcon,
-  Event as EventIcon,
   Warning as WarningIcon,
   Delete as DeleteIcon
 } from '@mui/icons-material';
@@ -59,11 +57,8 @@ const MemorandumComision = () => {
   const handleDelete = async () => {
     setActionLoading(true);
     try {
-      const token = localStorage.getItem('token');
       // Assuming the delete route will be implemented at /api/memorandum/:id
-      await axios.delete(`${API_BASE_URL}/api/memorandum/${confirmDialog.id}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      await axios.delete(`${API_BASE_URL}/api/memorandum/${confirmDialog.id}`);
       setSnackbar({ open: true, message: 'Memorandum eliminado con éxito', severity: 'success' });
       setConfirmDialog({ open: false, id: null });
       cargarMemorandums();
@@ -111,10 +106,7 @@ const MemorandumComision = () => {
 
   const cargarActividades = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_BASE_URL}/api/actividades`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await axios.get(`${API_BASE_URL}/api/actividades`);
       setActividades(response.data.actividades);
     } catch (error) {
       console.error('Error cargando actividades:', error);
@@ -132,10 +124,7 @@ const MemorandumComision = () => {
 
   const cargarVehiculos = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_BASE_URL}/api/vehiculos`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await axios.get(`${API_BASE_URL}/api/vehiculos`);
       setVehiculos(response.data);
     } catch (error) {
       console.error('Error cargando vehiculos:', error);
@@ -144,10 +133,7 @@ const MemorandumComision = () => {
 
   const cargarMemorandums = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_BASE_URL}/api/memorandum`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await axios.get(`${API_BASE_URL}/api/memorandum`);
       if (response.data.success) {
         setMemorandums(response.data.memorandums);
       }
@@ -240,7 +226,6 @@ const MemorandumComision = () => {
 
     setActionLoading(true);
     try {
-      const token = localStorage.getItem('token');
       const isEditing = formData.id_memorandum_comision !== null;
 
       const url = isEditing
@@ -249,9 +234,7 @@ const MemorandumComision = () => {
 
       const method = isEditing ? 'put' : 'post';
 
-      const response = await axios[method](url, formData, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await axios[method](url, formData);
 
       if (response.data.success) {
         setSnackbar({
@@ -305,9 +288,7 @@ const MemorandumComision = () => {
   const handleDescargarReporte = async (id, tipo = 'memorandum') => {
     try {
       setSnackbar({ open: true, message: 'Generando reporte, por favor espere...', severity: 'info' });
-      const token = localStorage.getItem('token');
       const response = await axios.get(`${API_BASE_URL}/api/reportes/${tipo}/${id}`, {
-        headers: { 'Authorization': `Bearer ${token}` },
         responseType: 'blob'
       });
 

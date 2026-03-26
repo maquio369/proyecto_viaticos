@@ -69,12 +69,9 @@ const GestionFirmas = () => {
 
     try {
       setActionLoading(true);
-      const token = localStorage.getItem('token');
       const response = await axios.post(`${API_BASE_URL}/api/firmas/agregar-empleado-como-firma`, {
         id_empleado_destino: empleadoSeleccionado.id_empleado,
         id_empleado_firmante: empleadoFirmanteAgregar.id_empleado
-      }, {
-        headers: { 'Authorization': `Bearer ${token}` }
       });
 
       if (response.data.success) {
@@ -103,10 +100,7 @@ const GestionFirmas = () => {
 
     try {
       setActionLoading(true);
-      const token = localStorage.getItem('token');
-      const response = await axios.delete(`${API_BASE_URL}/api/firmas/eliminar-adicional/${empleadoSeleccionado.id_empleado}/${firma.id_firma}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await axios.delete(`${API_BASE_URL}/api/firmas/eliminar-adicional/${empleadoSeleccionado.id_empleado}/${firma.id_firma}`);
 
       setSnackbar({
         open: true,

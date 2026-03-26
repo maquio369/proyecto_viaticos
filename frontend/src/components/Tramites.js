@@ -71,10 +71,7 @@ const Tramites = ({ user }) => {
     const cargarTramites = async () => {
         setLoading(true);
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_BASE_URL}/api/tramites`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await axios.get(`${API_BASE_URL}/api/tramites`);
             if (response.data.success) {
                 setTramites(response.data.tramites);
             }
@@ -128,21 +125,16 @@ const Tramites = ({ user }) => {
         e.preventDefault();
         setActionLoading(true);
         try {
-            const token = localStorage.getItem('token');
             const payload = {
                 ...formData,
                 id_firma: formData.id_firma === 'USER_SIGNATURE' ? null : formData.id_firma
             };
 
             if (formData.id_tramite) {
-                await axios.put(`${API_BASE_URL}/api/tramites/${formData.id_tramite}`, payload, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                await axios.put(`${API_BASE_URL}/api/tramites/${formData.id_tramite}`, payload);
                 showMessage('Trámite actualizado correctamente');
             } else {
-                await axios.post(`${API_BASE_URL}/api/tramites`, payload, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                await axios.post(`${API_BASE_URL}/api/tramites`, payload);
                 showMessage('Trámite creado correctamente');
             }
 
@@ -159,10 +151,7 @@ const Tramites = ({ user }) => {
     const handleEliminar = async () => {
         setActionLoading(true);
         try {
-            const token = localStorage.getItem('token');
-            await axios.delete(`${API_BASE_URL}/api/tramites/${deleteConfirm.id}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            await axios.delete(`${API_BASE_URL}/api/tramites/${deleteConfirm.id}`);
             cargarTramites();
             showMessage('Trámite eliminado correctamente');
         } catch (error) {
@@ -188,10 +177,7 @@ const Tramites = ({ user }) => {
 
     const cargarEmpleadosConComisiones = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_BASE_URL}/api/tramites/empleados-con-comisiones`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await axios.get(`${API_BASE_URL}/api/tramites/empleados-con-comisiones`);
             if (response.data.success) {
                 setEmpleadosConComisiones(response.data.empleados);
             }
@@ -202,10 +188,7 @@ const Tramites = ({ user }) => {
 
     const cargarDetallesTramite = async (id_tramite) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_BASE_URL}/api/tramites/${id_tramite}/detalles`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await axios.get(`${API_BASE_URL}/api/tramites/${id_tramite}/detalles`);
             if (response.data.success) {
                 setComisionesVinculadas(response.data.comisiones);
             }
@@ -228,10 +211,7 @@ const Tramites = ({ user }) => {
 
         setLoadingBusqueda(true);
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_BASE_URL}/api/tramites/comisiones-disponibles?empleado=${busqueda}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await axios.get(`${API_BASE_URL}/api/tramites/comisiones-disponibles?empleado=${busqueda}`);
             if (response.data.success) {
                 setComisionesBusqueda(response.data.comisiones);
             }
@@ -246,10 +226,8 @@ const Tramites = ({ user }) => {
     const handleVincular = async (id_memo) => {
         setActionLoading(true);
         try {
-            const token = localStorage.getItem('token');
             const response = await axios.post(`${API_BASE_URL}/api/tramites/${selectedTramite.id_tramite}/vincular-comision`,
-                { id_memorandum_comision: id_memo },
-                { headers: { 'Authorization': `Bearer ${token}` } }
+                { id_memorandum_comision: id_memo }
             );
             if (response.data.success) {
                 showMessage('Comisión vinculada correctamente');
@@ -268,10 +246,7 @@ const Tramites = ({ user }) => {
     const handleDesvincular = async (id_memo) => {
         setActionLoading(true);
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.delete(`${API_BASE_URL}/api/tramites/${selectedTramite.id_tramite}/desvincular-comision/${id_memo}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await axios.delete(`${API_BASE_URL}/api/tramites/${selectedTramite.id_tramite}/desvincular-comision/${id_memo}`);
             if (response.data.success) {
                 showMessage('Comisión desvinculada');
                 cargarDetallesTramite(selectedTramite.id_tramite);
@@ -631,6 +606,7 @@ const Tramites = ({ user }) => {
                                 <Autocomplete
                                     fullWidth
                                     size="small"
+                                    loading={loadingBusqueda}
                                     options={empleadosConComisiones}
                                     getOptionLabel={(option) => option.nombre_completo}
                                     value={empleadoSeleccionado}

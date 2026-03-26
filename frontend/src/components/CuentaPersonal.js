@@ -4,14 +4,13 @@ import { API_BASE_URL } from '../config';
 import {
   Box, Typography, TextField, CircularProgress, Button, Select, MenuItem,
   InputLabel, FormControl, Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, Paper, Chip, IconButton, InputAdornment,
+  TableHead, TableRow, Chip, IconButton, InputAdornment,
   Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert
 } from '@mui/material';
 import {
   Search as SearchIcon,
   AccountBalance as AccountBalanceIcon,
   Edit as EditIcon,
-  Warning as WarningIcon,
   Badge as BadgeIcon
 } from '@mui/icons-material';
 
@@ -57,10 +56,7 @@ const CuentaPersonal = ({ handleLogout }) => {
 
   const cargarBancos = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_BASE_URL}/api/catalogos/bancos`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await axios.get(`${API_BASE_URL}/api/catalogos/bancos`);
       setBancos(response.data.bancos || []);
     } catch (error) {
       console.error('Error cargando bancos:', error);
@@ -70,10 +66,7 @@ const CuentaPersonal = ({ handleLogout }) => {
   const cargarEmpleadosIniciales = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_BASE_URL}/api/empleados/buscar`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await axios.get(`${API_BASE_URL}/api/empleados/buscar`);
       setEmpleados(response.data.slice(0, 8));
     } catch (error) {
       if (error.response?.status === 401) {
@@ -88,10 +81,7 @@ const CuentaPersonal = ({ handleLogout }) => {
   const buscarEmpleados = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_BASE_URL}/api/empleados/buscar?q=${encodeURIComponent(busqueda)}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await axios.get(`${API_BASE_URL}/api/empleados/buscar?q=${encodeURIComponent(busqueda)}`);
       setEmpleados(response.data);
     } catch (error) {
       if (error.response?.status === 401) {
@@ -111,10 +101,7 @@ const CuentaPersonal = ({ handleLogout }) => {
     setLoadingAccount(true);
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_BASE_URL}/api/empleados/cuenta-bancaria/${empleado.id_empleado}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await axios.get(`${API_BASE_URL}/api/empleados/cuenta-bancaria/${empleado.id_empleado}`);
       if (response.data.cuenta) {
         setAccountForm({
           id_banco: response.data.cuenta.id_banco,
@@ -147,12 +134,9 @@ const CuentaPersonal = ({ handleLogout }) => {
 
     setActionLoading(true);
     try {
-      const token = localStorage.getItem('token');
       await axios.post(`${API_BASE_URL}/api/empleados/cuenta-bancaria`, {
         id_empleado: selectedEmpleado.id_empleado,
         ...accountForm
-      }, {
-        headers: { 'Authorization': `Bearer ${token}` }
       });
 
       setSnackbar({ open: true, message: 'Cuenta bancaria guardada con éxito', severity: 'success' });

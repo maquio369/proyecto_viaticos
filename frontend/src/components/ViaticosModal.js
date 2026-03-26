@@ -5,8 +5,7 @@ import {
     Dialog, DialogTitle, DialogContent, DialogActions, Box, Typography,
     TextField, Button, CircularProgress, Grid, Paper, Chip, IconButton,
     Alert, Snackbar, MenuItem, Select, FormControl, InputLabel,
-    Switch, FormControlLabel, Table, TableBody, TableCell, TableContainer,
-    TableHead, TableRow, Tooltip, InputAdornment
+    Switch, FormControlLabel, Tooltip, InputAdornment
 } from '@mui/material';
 import {
     AttachMoney as MoneyIcon,
@@ -16,13 +15,10 @@ import {
     LocationOn as LocationIcon,
     CalendarToday as CalendarIcon,
     Hotel as HotelIcon,
-    AccessTime as TimeIcon,
     Calculate as CalculateIcon,
     Delete as DeleteIcon,
     Add as AddIcon,
     Warning as WarningIcon,
-    CheckCircle as CheckIcon,
-    Person as PersonIcon,
     Close as CloseIcon
 } from '@mui/icons-material';
 
@@ -66,8 +62,6 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
     // Función para validar si la fecha de inicio es válida
     const esFechaInicioValida = (fechaInicio) => {
         if (!fechaInicio) return { valida: true };
-
-        const fechaIni = new Date(fechaInicio);
 
         // 1. Debe ser después de la actividad
         if (fechaActividad) {
@@ -120,7 +114,6 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
             cargarDetalles();
         }
     }, [isOpen, idMemorandum]);
-
     useEffect(() => {
         // Si NO pernocta, el total es solo el monto diario (sin multiplicar por días)
         // Si SÍ pernocta, el total es monto_diario * días
@@ -144,8 +137,7 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
 
             // Cargar firma del memorandum
             const resMemoFirma = await axios.get(
-                `${API_BASE_URL}/api/memorandum/${idMemorandum}/firma`,
-                { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+                `${API_BASE_URL}/api/memorandum/${idMemorandum}/firma`
             );
 
             // Cargar firmas fijas dinámicas (puede haber múltiples)
@@ -191,10 +183,7 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
 
     const cargarDetalles = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const res = await axios.get(`${API_BASE_URL}/api/viaticos/memorandum/${idMemorandum}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await axios.get(`${API_BASE_URL}/api/viaticos/memorandum/${idMemorandum}`);
             if (res.data.success) {
                 setDetalles(res.data.detalles);
                 setGastosGlobales(res.data.gastosGlobales);
@@ -217,14 +206,11 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
 
     const calcularTarifa = async () => {
         try {
-            const token = localStorage.getItem('token');
             const res = await axios.post(`${API_BASE_URL}/api/viaticos/calcular`, {
                 id_empleado: idEmpleado,
                 id_municipio: formData.id_municipio,
                 pernocta: formData.pernocta,
                 fecha_inicio: formData.fecha_inicio
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
             });
 
             if (res.data.success) {
@@ -369,8 +355,7 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
                 return;
             }
         }
-
-        // Validar uso de fechas (máximo 2 veces por fecha)
+        
         const fechasConflicto = validarUsoFechas(formData.fecha_inicio, formData.fecha_fin);
         if (fechasConflicto.length > 0) {
             setSnackbar({
@@ -383,7 +368,6 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
 
         setActionLoading(true);
         try {
-            const token = localStorage.getItem('token');
             const payload = {
                 id_memorandum_comision: idMemorandum,
                 id_municipio: formData.id_municipio,
@@ -403,9 +387,7 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
                 id_firma_fija: formData.id_firma_fija
             };
 
-            await axios.post(`${API_BASE_URL}/api/viaticos`, payload, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axios.post(`${API_BASE_URL}/api/viaticos`, payload);
 
             setSnackbar({ open: true, message: 'Viático agregado correctamente', severity: 'success' });
             cargarDetalles();
@@ -428,13 +410,6 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
     };
 
     const handleAgregarGastos = async () => {
-        if ((parseFloat(formData.pasaje) || 0) === 0 &&
-            (parseFloat(formData.combustible) || 0) === 0 &&
-            (parseFloat(formData.otros) || 0) === 0) {
-            setSnackbar({ open: true, message: 'Debe ingresar al menos un gasto', severity: 'warning' });
-            return;
-        }
-
         if (!formData.tipo) {
             setSnackbar({ open: true, message: 'Debe seleccionar el Tipo de Pago', severity: 'warning' });
             return;
@@ -442,8 +417,6 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
 
         setActionLoading(true);
         try {
-            const token = localStorage.getItem('token');
-
             const payload = {
                 id_memorandum_comision: idMemorandum,
                 pasaje: parseFloat(formData.pasaje) || 0,
@@ -454,9 +427,7 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
                 id_firma_fija: formData.id_firma_fija
             };
 
-            await axios.post(`${API_BASE_URL}/api/gastos-globales`, payload, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axios.post(`${API_BASE_URL}/api/gastos-globales`, payload);
 
             setSnackbar({ open: true, message: 'Gastos globales actualizados', severity: 'success' });
             cargarDetalles();
@@ -489,14 +460,11 @@ const ViaticosModal = ({ isOpen, onClose, idMemorandum, idEmpleado, onUpdate }) 
         const { id, type } = deleteConfirm;
         setActionLoading(true);
         try {
-            const token = localStorage.getItem('token');
             const url = type === 'global'
                 ? `${API_BASE_URL}/api/gastos-globales/${id}`
                 : `${API_BASE_URL}/api/viaticos/${id}`;
 
-            await axios.delete(url, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axios.delete(url);
 
             setSnackbar({
                 open: true,

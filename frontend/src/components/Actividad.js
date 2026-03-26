@@ -6,7 +6,7 @@ import {
   InputLabel, FormControl, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Paper, Chip, IconButton, InputAdornment,
   Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert,
-  ToggleButtonGroup, ToggleButton
+  ToggleButtonGroup, ToggleButton, LinearProgress
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -58,10 +58,7 @@ const Actividad = () => {
 
   const cargarActividades = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_BASE_URL}/api/actividades`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await axios.get(`${API_BASE_URL}/api/actividades`);
       if (response.data.success) {
         setActividades(response.data.actividades);
       }
@@ -85,10 +82,7 @@ const Actividad = () => {
   const cargarEstados = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_BASE_URL}/api/catalogos/estados`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await axios.get(`${API_BASE_URL}/api/catalogos/estados`);
       setEstados(response.data.estados);
     } catch (error) {
       console.error('Error cargando estados:', error);
@@ -132,7 +126,6 @@ const Actividad = () => {
 
     setActionLoading(true);
     try {
-      const token = localStorage.getItem('token');
       const fechaObj = new Date(formData.fechaHora);
       const fecha = fechaObj.toISOString().split('T')[0];
       const hora = fechaObj.toTimeString().split(' ')[0].substring(0, 5);
@@ -140,14 +133,10 @@ const Actividad = () => {
       const dataToSend = { ...formData, fecha, hora };
 
       if (editingId) {
-        await axios.put(`${API_BASE_URL}/api/actividades/${editingId}`, dataToSend, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        await axios.put(`${API_BASE_URL}/api/actividades/${editingId}`, dataToSend);
         setSnackbar({ open: true, message: 'Actividad actualizada con éxito', severity: 'success' });
       } else {
-        await axios.post(`${API_BASE_URL}/api/actividades`, dataToSend, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        await axios.post(`${API_BASE_URL}/api/actividades`, dataToSend);
         setSnackbar({ open: true, message: 'Actividad registrada con éxito', severity: 'success' });
       }
 
@@ -168,10 +157,7 @@ const Actividad = () => {
   const handleDelete = async () => {
     setActionLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`${API_BASE_URL}/api/actividades/${confirmDialog.id}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      await axios.delete(`${API_BASE_URL}/api/actividades/${confirmDialog.id}`);
       setSnackbar({ open: true, message: 'Actividad eliminada con éxito', severity: 'success' });
       setConfirmDialog({ open: false, id: null });
       cargarActividades();
@@ -257,14 +243,15 @@ const Actividad = () => {
 
       {/* Captura Card */}
       {showForm && (
-        <Paper elevation={0} sx={{
+        <Paper sx={{
           p: 4,
-          borderRadius: '24px',
           bgcolor: '#1e293b',
+          borderRadius: '24px',
           border: '1px solid #334155',
-          mb: 4,
-          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3)'
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3)',
+          overflow: 'hidden'
         }}>
+          {loading && <LinearProgress sx={{ mt: -4, mx: -4, mb: 3 }} />}
           <form onSubmit={handleSubmit}>
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
               <TextField

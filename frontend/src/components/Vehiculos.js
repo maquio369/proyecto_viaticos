@@ -50,17 +50,14 @@ const Vehiculos = () => {
 
     const cargarDatos = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const headers = { 'Authorization': `Bearer ${token}` };
-
             const [marcasRes, tiposRes, clasesRes, estatusRes, usosRes, empleadosRes, vehiculosRes] = await Promise.all([
-                axios.get(`${API_BASE_URL}/api/vehiculos/marcas`, { headers }),
-                axios.get(`${API_BASE_URL}/api/vehiculos/tipos`, { headers }),
-                axios.get(`${API_BASE_URL}/api/vehiculos/clases`, { headers }),
-                axios.get(`${API_BASE_URL}/api/vehiculos/estatus`, { headers }),
-                axios.get(`${API_BASE_URL}/api/vehiculos/usos`, { headers }),
+                axios.get(`${API_BASE_URL}/api/vehiculos/marcas`),
+                axios.get(`${API_BASE_URL}/api/vehiculos/tipos`),
+                axios.get(`${API_BASE_URL}/api/vehiculos/clases`),
+                axios.get(`${API_BASE_URL}/api/vehiculos/estatus`),
+                axios.get(`${API_BASE_URL}/api/vehiculos/usos`),
                 axios.get(`${API_BASE_URL}/api/catalogos/empleados`),
-                axios.get(`${API_BASE_URL}/api/vehiculos`, { headers })
+                axios.get(`${API_BASE_URL}/api/vehiculos`)
             ]);
 
             setCatalogs({
@@ -89,14 +86,11 @@ const Vehiculos = () => {
         e.preventDefault();
         setSaving(true);
         try {
-            const token = localStorage.getItem('token');
-            const headers = { 'Authorization': `Bearer ${token}` };
-
             if (editingId) {
-                await axios.put(`${API_BASE_URL}/api/vehiculos/${editingId}`, formData, { headers });
+                await axios.put(`${API_BASE_URL}/api/vehiculos/${editingId}`, formData);
                 setSnackbar({ open: true, message: 'Vehículo actualizado exitosamente', severity: 'success' });
             } else {
-                await axios.post(`${API_BASE_URL}/api/vehiculos`, formData, { headers });
+                await axios.post(`${API_BASE_URL}/api/vehiculos`, formData);
                 setSnackbar({ open: true, message: 'Vehículo registrado exitosamente', severity: 'success' });
             }
 
@@ -145,11 +139,7 @@ const Vehiculos = () => {
         const nombreVehiculo = `${confirmDialog.vehiculo.marca_de_vehiculo} ${confirmDialog.vehiculo.modelo}`;
 
         try {
-            setSaving(true); // Reutilizamos saving para bloquear el botón del diálogo
-            const token = localStorage.getItem('token');
-            await axios.delete(`${API_BASE_URL}/api/vehiculos/${id}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            await axios.delete(`${API_BASE_URL}/api/vehiculos/${id}`);
             setSnackbar({ open: true, message: `Vehículo ${nombreVehiculo} eliminado`, severity: 'success' });
             setConfirmDialog({ open: false, vehiculo: null });
             cargarDatos();

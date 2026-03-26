@@ -46,18 +46,15 @@ const CapturaVehiculos = ({ handleLogout }) => {
 
     const cargarDatos = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const headers = { 'Authorization': `Bearer ${token}` };
-
             // Cargar catálogos y lista de vehículos en paralelo
             const [marcasRes, tiposRes, clasesRes, estatusRes, usosRes, empleadosRes, vehiculosRes] = await Promise.all([
-                axios.get(`${API_BASE_URL}/api/vehiculos/marcas`, { headers }),
-                axios.get(`${API_BASE_URL}/api/vehiculos/tipos`, { headers }),
-                axios.get(`${API_BASE_URL}/api/vehiculos/clases`, { headers }),
-                axios.get(`${API_BASE_URL}/api/vehiculos/estatus`, { headers }),
-                axios.get(`${API_BASE_URL}/api/vehiculos/usos`, { headers }),
+                axios.get(`${API_BASE_URL}/api/vehiculos/marcas`),
+                axios.get(`${API_BASE_URL}/api/vehiculos/tipos`),
+                axios.get(`${API_BASE_URL}/api/vehiculos/clases`),
+                axios.get(`${API_BASE_URL}/api/vehiculos/estatus`),
+                axios.get(`${API_BASE_URL}/api/vehiculos/usos`),
                 axios.get(`${API_BASE_URL}/api/catalogos/empleados`),
-                axios.get(`${API_BASE_URL}/api/vehiculos`, { headers })
+                axios.get(`${API_BASE_URL}/api/vehiculos`)
             ]);
 
             setCatalogs({
@@ -84,10 +81,7 @@ const CapturaVehiculos = ({ handleLogout }) => {
 
     const cargarVehiculos = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_BASE_URL}/api/vehiculos`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await axios.get(`${API_BASE_URL}/api/vehiculos`);
             setVehiculos(response.data);
         } catch (error) {
             console.error('Error cargando vehículos:', error);
@@ -106,14 +100,11 @@ const CapturaVehiculos = ({ handleLogout }) => {
         e.preventDefault();
         setSaving(true);
         try {
-            const token = localStorage.getItem('token');
-            const headers = { 'Authorization': `Bearer ${token}` };
-
             if (editingId) {
-                await axios.put(`${API_BASE_URL}/api/vehiculos/${editingId}`, formData, { headers });
+                await axios.put(`${API_BASE_URL}/api/vehiculos/${editingId}`, formData);
                 alert('Vehículo actualizado exitosamente');
             } else {
-                await axios.post(`${API_BASE_URL}/api/vehiculos`, formData, { headers });
+                await axios.post(`${API_BASE_URL}/api/vehiculos`, formData);
                 alert('Vehículo registrado exitosamente');
             }
 
@@ -157,10 +148,7 @@ const CapturaVehiculos = ({ handleLogout }) => {
         if (!window.confirm('¿Estás seguro de eliminar este vehículo?')) return;
 
         try {
-            const token = localStorage.getItem('token');
-            await axios.delete(`${API_BASE_URL}/api/vehiculos/${id}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            await axios.delete(`${API_BASE_URL}/api/vehiculos/${id}`);
             alert('Vehículo eliminado');
             cargarVehiculos();
         } catch (error) {

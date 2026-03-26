@@ -58,15 +58,12 @@ const CapturaVehiculo = ({ onVehiculoGuardado, vehiculoEditar, onCancelarEdicion
 
     const cargarCatalogos = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const headers = { 'Authorization': `Bearer ${token}` };
-
             const [marcasRes, tiposRes, clasesRes, estatusRes, usosRes, empleadosRes] = await Promise.all([
-                axios.get(`${API_BASE_URL}/api/vehiculos/marcas`, { headers }),
-                axios.get(`${API_BASE_URL}/api/vehiculos/tipos`, { headers }),
-                axios.get(`${API_BASE_URL}/api/vehiculos/clases`, { headers }),
-                axios.get(`${API_BASE_URL}/api/vehiculos/estatus`, { headers }),
-                axios.get(`${API_BASE_URL}/api/vehiculos/usos`, { headers }),
+                axios.get(`${API_BASE_URL}/api/vehiculos/marcas`),
+                axios.get(`${API_BASE_URL}/api/vehiculos/tipos`),
+                axios.get(`${API_BASE_URL}/api/vehiculos/clases`),
+                axios.get(`${API_BASE_URL}/api/vehiculos/estatus`),
+                axios.get(`${API_BASE_URL}/api/vehiculos/usos`),
                 axios.get(`${API_BASE_URL}/api/catalogos/empleados`)
             ]);
 
@@ -92,13 +89,10 @@ const CapturaVehiculo = ({ onVehiculoGuardado, vehiculoEditar, onCancelarEdicion
         e.preventDefault();
         setSaving(true);
         try {
-            const token = localStorage.getItem('token');
-            const headers = { 'Authorization': `Bearer ${token}` };
-
             if (vehiculoEditar) {
-                await axios.put(`${API_BASE_URL}/api/vehiculos/${vehiculoEditar.id_vehiculo}`, formData, { headers });
+                await axios.put(`${API_BASE_URL}/api/vehiculos/${vehiculoEditar.id_vehiculo}`, formData);
             } else {
-                await axios.post(`${API_BASE_URL}/api/vehiculos`, formData, { headers });
+                await axios.post(`${API_BASE_URL}/api/vehiculos`, formData);
             }
 
             resetForm();

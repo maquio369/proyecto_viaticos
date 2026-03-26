@@ -44,15 +44,12 @@ const GestionEmpleados = () => {
     });
 
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [rowsPerPage] = useState(10);
 
     const fetchEmployees = useCallback(async () => {
         setLoading(true);
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_BASE_URL}/api/empleados/full`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await axios.get(`${API_BASE_URL}/api/empleados/full`);
             if (response.data.success) {
                 setEmployees(response.data.empleados);
             }
@@ -66,10 +63,7 @@ const GestionEmpleados = () => {
 
     const fetchAreas = useCallback(async () => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_BASE_URL}/api/catalogos/areas`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await axios.get(`${API_BASE_URL}/api/catalogos/areas`);
             if (response.data.success) {
                 setAreas(response.data.areas);
             }
@@ -136,16 +130,11 @@ const GestionEmpleados = () => {
 
         setActionLoading(true);
         try {
-            const token = localStorage.getItem('token');
             if (formData.id_empleado) {
-                await axios.put(`${API_BASE_URL}/api/empleados/${formData.id_empleado}`, formData, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                await axios.put(`${API_BASE_URL}/api/empleados/${formData.id_empleado}`, formData);
                 showSnackbar('Empleado actualizado correctamente');
             } else {
-                await axios.post(`${API_BASE_URL}/api/empleados`, formData, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                await axios.post(`${API_BASE_URL}/api/empleados`, formData);
                 showSnackbar('Empleado creado correctamente');
             }
             fetchEmployees();
@@ -162,10 +151,7 @@ const GestionEmpleados = () => {
         if (!window.confirm('¿Está seguro de eliminar este empleado?')) return;
 
         try {
-            const token = localStorage.getItem('token');
-            await axios.delete(`${API_BASE_URL}/api/empleados/${id}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            await axios.delete(`${API_BASE_URL}/api/empleados/${id}`);
             showSnackbar('Empleado eliminado correctamente');
             fetchEmployees();
         } catch (error) {
@@ -179,15 +165,6 @@ const GestionEmpleados = () => {
         emp.rfc?.toLowerCase().includes(search.toLowerCase()) ||
         emp.area_nombre?.toLowerCase().includes(search.toLowerCase())
     );
-
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-    };
-
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
-    };
 
     const paginatedEmployees = filteredEmployees.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 

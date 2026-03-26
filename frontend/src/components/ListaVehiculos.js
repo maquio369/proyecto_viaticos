@@ -20,10 +20,7 @@ const ListaVehiculos = ({ onEditarVehiculo }) => {
 
     const cargarVehiculos = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_BASE_URL}/api/vehiculos`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await axios.get(`${API_BASE_URL}/api/vehiculos`);
             setVehiculos(response.data);
         } catch (error) {
             console.error('Error cargando vehículos:', error);
@@ -36,10 +33,7 @@ const ListaVehiculos = ({ onEditarVehiculo }) => {
         if (!window.confirm('¿Estás seguro de eliminar este vehículo?')) return;
 
         try {
-            const token = localStorage.getItem('token');
-            await axios.delete(`${API_BASE_URL}/api/vehiculos/${id}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            await axios.delete(`${API_BASE_URL}/api/vehiculos/${id}`);
             cargarVehiculos();
         } catch (error) {
             console.error('Error eliminando vehículo:', error);

@@ -115,10 +115,7 @@ const AreasTree = () => {
     const fetchData = React.useCallback(async () => {
         setLoading(true);
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_BASE_URL}/api/areas/tree`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const response = await axios.get(`${API_BASE_URL}/api/areas/tree`);
             if (response.data.success) {
                 setTreeData(response.data.tree);
             }
