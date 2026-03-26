@@ -757,9 +757,10 @@ const MemorandumComision = () => {
                           <PdfIcon sx={{ fontSize: 18 }} />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="Reporte Comisión">
+                      <Tooltip title="Reporte Oficial (Memorándum)">
                         <IconButton
                           size="small"
+                          onClick={() => handleDescargarReporte(memo.id_memorandum_comision, 'memorandum-oficial')}
                           sx={{
                             color: '#64748b',
                             border: '1px solid #334155',

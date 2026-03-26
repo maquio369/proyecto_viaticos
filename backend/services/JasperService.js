@@ -115,6 +115,20 @@ class JasperService {
     }
   }
 
+  // Especializado para Memorandum Oficial
+  async generateOfficialMemorandumReport(idMemorandum) {
+    try {
+      const reportPath = '/Reportes_del_sistema_de_viaticos/memorandum_oficial';
+      const parameters = { 
+        id_memo: idMemorandum
+      };
+      return await this.generateReport(reportPath, 'pdf', parameters);
+    } catch (error) {
+      console.error('❌ Error en generateOfficialMemorandumReport:', error.message);
+      throw error;
+    }
+  }
+
   getContentType(format) {
     const types = { 'pdf': 'application/pdf', 'html': 'text/html', 'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' };
     return types[format] || 'application/octet-stream';

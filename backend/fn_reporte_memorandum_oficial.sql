@@ -1,5 +1,5 @@
 -- Versión DEFINITIVA de la función para el Memorandum Oficial
--- Incluye lógica de categorías para el puesto del empleado (Unificado con el reporte anterior)
+-- Actualizado: nombre_empleado ya no incluye el prefijo de la base de datos
 CREATE OR REPLACE FUNCTION viaticos.fn_reporte_memorandum_oficial(p_id_memorandum INTEGER)
 RETURNS TABLE (
     memorandum_no TEXT,
@@ -38,7 +38,7 @@ BEGIN
             END || ' DE ' || 
             TO_CHAR(mc.fecha_creacion, 'YYYY')
         ) as fecha_reporte,
-        UPPER(TRIM(CONCAT(COALESCE(e.prefijo, ''), ' ', e.nombres, ' ', e.apellido1, ' ', e.apellido2))) as nombre_empleado,
+        UPPER(TRIM(CONCAT(e.nombres, ' ', e.apellido1, ' ', e.apellido2))) as nombre_empleado,
         UPPER(COALESCE(
             (SELECT CONCAT(cat_pos.puesto, ' ', ce_pos.literal)
              FROM public.empleados_datos_laborales edl_pos
@@ -61,7 +61,11 @@ BEGIN
         UPPER(COALESCE(f.nombre_firma, '')) as nombre_autoriza,
         UPPER(COALESCE(f.cargo_firma, '')) as cargo_autoriza,
         UPPER(COALESCE(ea.descripcion, 'OFICINA DEL GOBERNADOR')) as organismo,
-        UPPER(COALESCE(ar.descripcion, 'ÁREA SOLICITANTE')) as area_nombre
+        UPPER(COALESCE(
+            (SELECT ar_fis.descripcion FROM public.areas ar_fis WHERE ar_fis.id_area = e.id_lugar_fisico_de_trabajo),
+            ar.descripcion,
+            'ÁREA SOLICITANTE'
+        )) as area_nombre
     FROM viaticos.memorandum_comision mc
     JOIN public.empleados e ON mc.id_empleado = e.id_empleado
     LEFT JOIN public.cargos c_emp ON e.id_cargo = c_emp.id_cargo
